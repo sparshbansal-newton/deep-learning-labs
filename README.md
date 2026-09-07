@@ -8,10 +8,10 @@ no server, and no external data to download.
 
 ## Labs
 
-| Lab | Topic | Covers |
+| # | Lab | Covers |
 |-----|-------|--------|
-| Gradient Descent | [gradient-descent-lab.html](gradient-descent-lab.html) | Batch, stochastic and mini-batch regimes; epochs; convergence path; memory cost |
-| Data Pipeline | [dataset-dataloader-lab.html](dataset-dataloader-lab.html) | `Dataset`, `DataLoader`, transforms, samplers, `collate_fn`, `num_workers` |
+| Lab 06 | [Gradient Descent and Its Types](gradient-descent-lab.html) | Batch, stochastic and mini-batch regimes in PyTorch; loss curves; optimisation path; vectorisation vs. memory |
+| Lab 07 | [Datasets and DataLoaders in PyTorch](dataset-dataloader-lab.html) | `Dataset`, `DataLoader`, transforms, samplers, `collate_fn`, `num_workers` |
 
 ## Adding a lab
 
