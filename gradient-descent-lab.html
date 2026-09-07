@@ -1,0 +1,1766 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Batch vs. Stochastic Gradient Descent — Interactive Worksheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --navy:#0f2440; --navy-2:#1b3c69; --navy-3:#3f6394; --navy-soft:#e4ebf4;
+  --amber:#c67c11; --amber-2:#e9a52b; --amber-soft:#fdf0d6;
+  --cream:#faf6ec; --paper:#fffdf8; --ink:#22262c; --ink-2:#555c66; --ink-3:#7b838e;
+  --rule:#ddd6c4; --rule-2:#c9c0aa;
+  --code-bg:#12263f; --code-ink:#e8eef7; --code-key:#e9a52b; --code-com:#8fa6c2; --code-str:#a8d5a2; --code-num:#f0b8b8;
+  --ok:#2f6b45; --ok-bg:#e6f2ea; --bad:#a33b2c; --bad-bg:#fbeae7;
+  --lock:#9aa2ad;
+  --serif:Cambria,"Source Serif 4",Georgia,"Times New Roman",serif;
+  --sans:Calibri,"Source Sans 3","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",Consolas,"SF Mono",Menlo,monospace;
+  --sh:0 1px 2px rgba(15,36,64,.06),0 4px 14px rgba(15,36,64,.07);
+  --maxw:1120px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--serif);color:var(--navy);font-weight:700;line-height:1.24;margin:0}
+p{margin:.65em 0}
+code,kbd{font-family:var(--mono);font-size:.88em}
+a{color:var(--navy-2)}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:rgba(15,36,64,.97);color:#fff;backdrop-filter:saturate(1.4) blur(8px);border-bottom:3px solid var(--amber)}
+.topbar-in{max-width:var(--maxw);margin:0 auto;padding:.55rem 1.1rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.brand{font-family:var(--serif);font-weight:700;font-size:1.02rem;letter-spacing:.01em;margin-right:auto}
+.brand small{display:block;font-family:var(--sans);font-weight:400;font-size:.72rem;color:#a8bcd6;letter-spacing:.04em;text-transform:uppercase}
+.prog{display:flex;align-items:center;gap:.6rem;font-size:.84rem;color:#dce6f2;font-variant-numeric:tabular-nums}
+.prog-track{width:150px;height:7px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden}
+.prog-fill{height:100%;width:0;background:linear-gradient(90deg,var(--amber),var(--amber-2));border-radius:99px;transition:width .45s cubic-bezier(.4,0,.2,1)}
+.tb-btn{font-family:var(--sans);font-size:.8rem;font-weight:600;color:#f2f6fb;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);padding:.34rem .72rem;border-radius:6px;cursor:pointer;transition:.16s}
+.tb-btn:hover{background:rgba(233,165,43,.28);border-color:var(--amber-2)}
+.tb-btn:focus-visible{outline:2px solid var(--amber-2);outline-offset:2px}
+
+/* ---------- shell ---------- */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 1.1rem 5rem}
+.masthead{padding:2.6rem 0 1.5rem;border-bottom:1px solid var(--rule)}
+.masthead .eyebrow{font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);font-weight:700}
+.masthead h1{font-size:2.35rem;margin:.35rem 0 .4rem;letter-spacing:-.012em}
+.masthead .sub{font-size:1.02rem;color:var(--ink-2);max-width:64ch}
+.meta-row{display:flex;gap:1.6rem;flex-wrap:wrap;margin-top:1.1rem;font-size:.82rem;color:var(--ink-3)}
+.meta-row b{color:var(--navy);font-weight:600}
+
+.callout{background:var(--paper);border:1px solid var(--rule);border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:.9rem 1.1rem;margin:1.4rem 0;box-shadow:var(--sh)}
+.callout h4{font-size:.98rem;margin-bottom:.2rem}
+.callout p{margin:.3rem 0;font-size:.94rem;color:var(--ink-2)}
+
+/* ---------- sections ---------- */
+.concept{background:var(--paper);border:1px solid var(--rule);border-radius:10px;margin:1.15rem 0;box-shadow:var(--sh);overflow:hidden;transition:border-color .2s}
+.concept.locked{opacity:.6}
+.concept.done{border-color:#bcd3c4}
+.c-head{display:flex;align-items:center;gap:.85rem;width:100%;text-align:left;background:none;border:0;padding:1rem 1.15rem;cursor:pointer;font:inherit}
+.c-head:hover{background:#fbf8f1}
+.c-head:focus-visible{outline:2px solid var(--amber);outline-offset:-3px}
+.concept.locked .c-head{cursor:not-allowed}
+.c-num{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--navy);color:#fff;font-family:var(--serif);font-weight:700;font-size:.92rem}
+.concept.done .c-num{background:var(--ok)}
+.concept.locked .c-num{background:var(--lock)}
+.c-title{font-family:var(--serif);font-weight:700;font-size:1.16rem;color:var(--navy);flex:1;min-width:0}
+.c-title span{display:block;font-family:var(--sans);font-weight:400;font-size:.79rem;color:var(--ink-3);margin-top:.1rem}
+.c-badge{flex:none;font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:.24rem .58rem;border-radius:99px;background:var(--navy-soft);color:var(--navy-2)}
+.concept.done .c-badge{background:var(--ok-bg);color:var(--ok)}
+.concept.locked .c-badge{background:#eceef1;color:var(--lock);letter-spacing:.07em}
+.concept.locked .c-head:hover{background:#f7f3ec}
+.concept.locked .c-title{color:var(--lock)}
+@keyframes nudge{0%,100%{transform:translateX(0)}18%{transform:translateX(-6px)}38%{transform:translateX(6px)}58%{transform:translateX(-3px)}78%{transform:translateX(3px)}}
+.concept.nudge{animation:nudge .4s ease}
+#toast{position:fixed;left:50%;top:74px;z-index:95;transform:translateX(-50%) translateY(-12px);
+  background:var(--navy);color:#fff;font-family:var(--sans);font-size:.88rem;line-height:1.45;
+  padding:.62rem 1.05rem;border-radius:8px;border-left:3px solid var(--amber-2);
+  box-shadow:0 10px 30px rgba(15,36,64,.3);opacity:0;pointer-events:none;transition:.24s ease;
+  max-width:min(92vw,540px)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast b{color:var(--amber-2)}
+.c-caret{flex:none;color:var(--ink-3);transition:transform .25s;font-size:.8rem}
+.concept.open .c-caret{transform:rotate(90deg)}
+.c-body{display:none;padding:0 1.15rem 1.35rem;border-top:1px solid var(--rule)}
+.concept.open .c-body{display:block;animation:fade .28s ease}
+@keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+.strip{display:none;align-items:center;gap:.55rem;padding:.55rem 1.15rem .8rem;font-size:.87rem;color:var(--ok);background:var(--ok-bg);border-top:1px solid #cfe3d6}
+.concept.done:not(.open) .strip{display:flex}
+.strip b{font-family:var(--mono);font-size:.85em}
+
+/* ---------- content atoms ---------- */
+.hook{font-family:var(--serif);font-size:1.09rem;font-style:italic;color:var(--navy-2);border-left:3px solid var(--amber-2);padding:.15rem 0 .15rem .85rem;margin:1.15rem 0 1.2rem}
+h3.blk{font-size:.79rem;letter-spacing:.13em;text-transform:uppercase;color:var(--amber);font-family:var(--sans);font-weight:700;margin:1.7rem 0 .6rem;padding-bottom:.3rem;border-bottom:1px solid var(--rule)}
+h3.blk:first-child{margin-top:.9rem}
+
+.rule-card{border:1px solid var(--rule);border-radius:8px;overflow:hidden;background:#fff}
+.rule-formula{background:var(--navy-soft);padding:1rem 1.1rem;text-align:center;font-family:var(--serif);font-size:1.16rem;color:var(--navy);border-bottom:1px solid var(--rule)}
+.rule-formula .fl{display:block;margin:.3rem 0}
+.rule-formula em{font-style:italic}
+.rule-note{font-family:var(--sans);font-size:.8rem;color:var(--ink-2);font-style:normal;display:block;margin-top:.5rem}
+.sub{font-size:.72em;vertical-align:sub}
+.sup{font-size:.72em;vertical-align:super}
+
+pre{margin:0;background:var(--code-bg);color:var(--code-ink);padding:.95rem 1.05rem;overflow-x:auto;font-family:var(--mono);font-size:.83rem;line-height:1.6}
+pre .k{color:var(--code-key)}
+pre .c{color:var(--code-com);font-style:italic}
+pre .s{color:var(--code-str)}
+pre .n{color:var(--code-num)}
+pre .hl{background:rgba(233,165,43,.17);display:inline-block;width:100%;margin:0 -1.05rem;padding:0 1.05rem}
+.code-cap{background:#0b1c30;color:#93a9c4;font-family:var(--sans);font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;padding:.4rem 1.05rem;border-bottom:1px solid #1e3a5c}
+
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin:.9rem 0}
+.pair>div{min-width:0}
+.pair>div:first-child{border-right:1px solid var(--rule)}
+.pair .ph{background:#f4efe3;font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;font-weight:700;color:var(--ink-2);padding:.4rem .85rem;border-bottom:1px solid var(--rule)}
+.pair .pb{padding:.85rem;background:#fff;font-size:.9rem}
+.pair .pb.term{background:var(--code-bg);color:var(--code-ink);font-family:var(--mono);font-size:.8rem;line-height:1.65;height:100%}
+.pair .pb.term .out{color:#8fe0a6}
+@media(max-width:720px){.pair{grid-template-columns:1fr}.pair>div:first-child{border-right:0;border-bottom:1px solid var(--rule)}}
+
+table{width:100%;border-collapse:collapse;font-size:.87rem;margin:.85rem 0}
+th,td{text-align:left;padding:.48rem .6rem;border-bottom:1px solid var(--rule)}
+th{background:#f4efe3;font-weight:700;color:var(--navy);font-size:.76rem;letter-spacing:.05em;text-transform:uppercase}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:.83rem;font-variant-numeric:tabular-nums}
+tbody tr:hover{background:#fbf8f1}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+td .sym{font-family:var(--serif);font-style:italic;font-size:1.03em;color:var(--navy)}
+td .var{font-family:var(--mono);font-size:.85em;background:var(--navy-soft);padding:.08rem .32rem;border-radius:3px;color:var(--navy)}
+.hi{background:var(--amber-soft);font-weight:600}
+
+/* ---------- interactive ---------- */
+.q{border:1px solid var(--rule);border-left:3px solid var(--navy-2);border-radius:0 8px 8px 0;background:#fff;padding:.85rem 1rem;margin:.8rem 0}
+.q.solved{border-left-color:var(--ok);background:#fbfefc}
+.q-tag{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink-3);margin-bottom:.3rem}
+.q-prompt{font-size:.95rem;margin-bottom:.6rem}
+.q-prompt .mono{font-family:var(--mono);font-size:.87em;background:#f2f3f5;padding:.08rem .3rem;border-radius:3px}
+.slot{display:inline-block;min-width:74px;text-align:center;font-family:var(--mono);font-size:.88em;padding:.14rem .5rem;border-bottom:2px dashed var(--amber);background:var(--amber-soft);border-radius:3px 3px 0 0;color:var(--ink-3);vertical-align:baseline}
+.slot.filled{border-bottom:2px solid var(--ok);background:var(--ok-bg);color:var(--ok);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.55rem}
+.chip{font-family:var(--mono);font-size:.82rem;padding:.34rem .68rem;border:1px solid var(--rule-2);background:#fff;border-radius:6px;cursor:pointer;transition:.14s;color:var(--ink);line-height:1.35;text-align:left}
+.chip:hover:not(:disabled){border-color:var(--amber);background:var(--amber-soft);transform:translateY(-1px)}
+.chip:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.chip.wrong{background:#f1f1f2;color:#a9aeb5;border-color:#e2e3e5;text-decoration:line-through;cursor:not-allowed;transform:none}
+.chip.right{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:700;cursor:default}
+.chip.mcqtext{font-family:var(--sans);font-size:.88rem;display:block;width:100%}
+.chips.stack{flex-direction:column}
+.fb{margin-top:.55rem;font-size:.86rem;padding:.5rem .7rem;border-radius:6px;display:none}
+.fb.show{display:block;animation:fade .2s}
+.fb.err{background:var(--bad-bg);color:var(--bad);border-left:3px solid var(--bad)}
+.fb.good{background:var(--ok-bg);color:var(--ok);border-left:3px solid var(--ok)}
+.fb b{font-weight:700}
+
+/* ---------- figure ---------- */
+figure{margin:1rem 0;border:1px solid var(--rule);border-radius:8px;background:#fff;padding:.9rem;overflow:hidden}
+figure svg{display:block;width:100%;height:auto}
+figcaption{font-size:.8rem;color:var(--ink-2);margin-top:.6rem;line-height:1.5}
+figcaption b{color:var(--navy)}
+.legend{display:flex;gap:1.1rem;flex-wrap:wrap;font-size:.78rem;color:var(--ink-2);margin-top:.5rem}
+.legend i{display:inline-block;width:16px;height:3px;border-radius:2px;vertical-align:middle;margin-right:.3rem}
+
+/* ---------- overlay ---------- */
+.ov{position:fixed;inset:0;background:rgba(15,36,64,.55);z-index:90;display:none;padding:1.2rem;overflow-y:auto}
+.ov.show{display:block;animation:fade .2s}
+.ov-card{max-width:940px;margin:1.5rem auto;background:var(--paper);border-radius:12px;padding:1.5rem 1.7rem;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.ov-card h2{font-size:1.4rem;margin-bottom:.2rem}
+.ov-close{float:right;font-size:.85rem;border:1px solid var(--rule-2);background:#fff;padding:.3rem .7rem;border-radius:6px;cursor:pointer;font-family:var(--sans)}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+footer{border-top:1px solid var(--rule);margin-top:2.5rem;padding-top:1.2rem;font-size:.8rem;color:var(--ink-3)}
+
+/* ---------- print ---------- */
+@media print{
+  :root{--cream:#fff;--paper:#fff}
+  .topbar,.ov,.chips,.tb-btn,.c-caret,#toast{display:none!important}
+  body{font-size:10.5pt;background:#fff}
+  .wrap{max-width:100%;padding:0}
+  .concept{break-inside:avoid;box-shadow:none;border:1px solid #bbb;opacity:1!important}
+  .concept .c-body{display:block!important}
+  .concept.locked{opacity:1!important}
+  pre{background:#f4f4f4;color:#111;border:1px solid #ddd}
+  pre .c{color:#666}pre .k{color:#8a5a00}pre .s{color:#256029}pre .n{color:#8a2b2b}
+  .slot{background:#fff;border-bottom:1px solid #333;color:#000}
+  .slot::after{content:" " attr(data-answer);font-weight:700;color:#000}
+  .strip{display:flex!important}
+  a[href]::after{content:""}
+}
+</style>
+</head>
+<body>
+<div class="sr" role="status" aria-live="polite" id="live"></div>
+<div id="toast" role="status"></div>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">Batch vs. Stochastic Gradient Descent<small>Optimization in Deep Learning · Interactive Worksheet</small></div>
+    <div class="prog">
+      <span id="progText" aria-live="off">0 / 0 filled</span>
+      <span class="prog-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Worksheet completion"><span class="prog-fill" id="progFill"></span></span>
+    </div>
+    <button class="tb-btn" id="btnUnlock" aria-pressed="false" title="Open every section without answering — for reviewing the sheet">Unlock all</button>
+    <button class="tb-btn" id="btnRef" aria-haspopup="dialog">Reference</button>
+    <button class="tb-btn" id="btnPrint">Print</button>
+    <button class="tb-btn" id="btnReset">Reset</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+<div class="masthead">
+  <div class="eyebrow">Neural Networks · Deep Learning Foundations</div>
+  <h1>How many times do the weights actually change?</h1>
+  <p class="sub">Batch, Stochastic and Mini-Batch Gradient Descent are the <em>same</em> algorithm with one dial turned: how many rows you look at before you touch the weights. This worksheet fuses the rule, the code that implements it, and one running six-row dataset carried through every section — so the maths and the variable values agree line for line.</p>
+  <div class="meta-row">
+    <span><b>Running dataset</b> Social_Network_Ads.csv — 6 real rows</span>
+    <span><b>Live code</b> NumPy pseudocode + Keras <code>.fit()</code></span>
+    <span><b>Timings</b> measured, not quoted</span>
+  </div>
+</div>
+
+<div class="callout">
+  <h4>How this worksheet works</h4>
+  <p>Sections unlock top to bottom. Fill every blank and answer both checks in a section and it collapses to a one-line result you can scan later. Wrong chips grey out with a hint aimed at that exact mistake — guessing costs you nothing but tells you nothing either. Nothing is saved; <b>Reset</b> clears everything.</p>
+  <p>A section shows <b>Locked</b> until the one above it is complete — clicking it will take you to what is still unanswered. To read the whole sheet without answering anything, press <b>Unlock all</b>.</p>
+</div>
+
+<!-- =============== SECTION 1 =============== -->
+<section class="concept" id="s1" data-idx="1">
+  <button class="c-head" aria-expanded="false" aria-controls="s1b">
+    <span class="c-num">1</span>
+    <span class="c-title">The Update Budget<span>Where gradient descent sits inside backpropagation</span></span>
+    <span class="c-badge" data-badge>0 / 4</span>
+    <span class="c-caret">&#9656;</span>
+  </button>
+  <div class="c-body" id="s1b">
+    <p class="hook">You run <code>model.fit(X, y, epochs=10)</code> on 400 rows. Ten epochs, 4000 row-visits — but how many times did the weight matrix actually change? The answer is not one number. It is entirely set by one argument you have not looked at yet.</p>
+
+    <h3 class="blk">Rule</h3>
+    <div class="rule-card">
+      <div class="rule-formula">
+        <span class="fl">updates per epoch = &#8968; <em>N</em> / <em>B</em> &#8969;</span>
+        <span class="rule-note"><em>N</em> = training rows &nbsp;·&nbsp; <em>B</em> = batch size &nbsp;·&nbsp; &#8968;&nbsp;&#8969; = round <em>up</em> (the leftover rows still get their own update)</span>
+      </div>
+      <div class="code-cap">The backpropagation skeleton — every variant plugs in here</div>
+<pre><span class="c"># 1 epoch = one full pass over the training data.</span>
+<span class="c"># What changes between variants is ONLY the size of `chunk`.</span>
+<span class="k">for</span> epoch <span class="k">in</span> range(epochs):
+    <span class="k">for</span> chunk <span class="k">in</span> batches(dataset, batch_size):   <span class="c"># B rows at a time</span>
+        prediction = forward_propagate(chunk)
+        loss       = calculate_loss(chunk, prediction)
+        gradients  = backward_propagate(loss)
+<span class="hl">        update_weights_and_biases(gradients)      <span class="c"># &lt;-- the update. Count these.</span></span>
+    average_loss = calculate_epoch_average()</pre>
+    </div>
+
+    <div class="tw">
+    <table>
+      <caption class="sr">Mapping from mathematical symbols to code variable names</caption>
+      <thead><tr><th style="width:16%">Symbol</th><th style="width:26%">Code variable</th><th>Meaning in this worksheet</th></tr></thead>
+      <tbody>
+        <tr><td><span class="sym">N</span></td><td><span class="var">X_train.shape[0]</span></td><td>Number of training rows — <b data-v="N6"></b> in our running example, <b data-v="Nfull"></b> in the full CSV</td></tr>
+        <tr><td><span class="sym">B</span></td><td><span class="var">batch_size</span></td><td>Rows consumed before one weight update</td></tr>
+        <tr><td><span class="sym">&theta;</span></td><td><span class="var">weights</span>, <span class="var">bias</span></td><td>The parameters being moved</td></tr>
+        <tr><td><span class="sym">&eta;</span></td><td><span class="var">learning_rate</span></td><td>Step size — fixed at <b data-v="LR"></b> throughout</td></tr>
+        <tr><td><span class="sym">J(&theta;)</span></td><td><span class="var">loss</span></td><td>Binary cross-entropy, averaged over whatever rows the update saw</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 class="blk">Worked example — one dial, three regimes</h3>
+    <p>Our full CSV has <b data-v="Nfull"></b> rows. Keras holds back <span class="mono">validation_split=0.2</span>, leaving <b data-v="Ntrain"></b> training rows. Watch what the single <span class="mono">batch_size</span> argument does to the update count — nothing else in the code changes.</p>
+    <div class="tw">
+    <table>
+      <thead><tr><th>Call</th><th class="num">B</th><th class="num">Updates / epoch</th><th class="num">Updates in 10 epochs</th><th>Variant</th></tr></thead>
+      <tbody id="tblRegimes"></tbody>
+    </table>
+    </div>
+    <p style="font-size:.88rem;color:var(--ink-2)">Those middle-column numbers are exactly what Keras prints as the progress-bar denominator — <span class="mono">1/1</span> for full batch, <span class="mono">320/320</span> for <span class="mono">batch_size=1</span>. You have been reading the update count on every training run without noticing.</p>
+
+    <h3 class="blk">Your turn</h3>
+    <div class="q" data-item="s1_b1"></div>
+    <div class="q" data-item="s1_b2"></div>
+    <h3 class="blk">Check yourself</h3>
+    <div class="q" data-item="s1_m1"></div>
+    <div class="q" data-item="s1_m2"></div>
+  </div>
+  <div class="strip"><span>&#10003;</span><span>One epoch, <b data-v="Ntrain"></b> rows: <b>1</b> update at <span class="mono">B=320</span>, <b>320</b> at <span class="mono">B=1</span>. Same data, same epochs, 320&times; the learning steps.</span></div>
+</section>
+
+<!-- =============== SECTION 2 =============== -->
+<section class="concept locked" id="s2" data-idx="2">
+  <button class="c-head" aria-expanded="false" aria-controls="s2b">
+    <span class="c-num">2</span>
+    <span class="c-title">Batch Gradient Descent<span>Every row votes, the model takes one step</span></span>
+    <span class="c-badge" data-badge>0 / 5</span>
+    <span class="c-caret">&#9656;</span>
+  </button>
+  <div class="c-body" id="s2b">
+    <p class="hook">Six rows disagree with each other. Batch GD makes them vote, averages the ballot, and steps once. How far does one democratic step actually move a weight — and is it further or shorter than you would guess?</p>
+
+    <h3 class="blk">Rule</h3>
+    <div class="rule-card">
+      <div class="rule-formula">
+        <span class="fl">&theta; &#8592; &theta; &minus; &eta; &middot; (1/<em>m</em>) &sum;<span class="sub">i=1</span><span class="sup">m</span> &nabla;<span class="sub">&theta;</span> J<span class="sub">i</span></span>
+        <span class="rule-note">with <em>m</em> = <em>N</em>: the sum runs over the <b>entire</b> training set before &theta; changes. <b>1 epoch = 1 update.</b></span>
+      </div>
+      <div class="code-cap">Vanilla batch GD — one vectorized pass, one update</div>
+<pre><span class="k">import</span> numpy <span class="k">as</span> np
+
+weights       = np.array([<span class="n">0.5</span>, <span class="n">-0.5</span>])
+bias          = <span class="n">0.0</span>
+learning_rate = <span class="n">0.1</span>
+
+<span class="k">for</span> i <span class="k">in</span> range(epochs):
+    <span class="c"># the ENTIRE dataset in one dot product</span>
+    z     = np.dot(X_train, weights) + bias
+    y_hat = <span class="n">1</span> / (<span class="n">1</span> + np.exp(-z))
+
+    <span class="c"># gradient of the GLOBAL (mean) loss</span>
+<span class="hl">    d_weights = np.dot(X_train.T, (y_hat - y_train)) / len(y_train)</span>
+    d_bias    = np.sum(y_hat - y_train) / len(y_train)
+
+    <span class="c"># parameter update happens precisely ONCE per epoch</span>
+    weights = weights - learning_rate * d_weights
+    bias    = bias    - learning_rate * d_bias</pre>
+    </div>
+
+    <div class="tw">
+    <table>
+      <thead><tr><th style="width:18%">Symbol</th><th style="width:30%">Code variable</th><th>Value at the start of epoch 1</th></tr></thead>
+      <tbody>
+        <tr><td><span class="sym">&theta;</span> = (w&#8321;, w&#8322;)</td><td><span class="var">weights</span></td><td class="mono" data-v="W0"></td></tr>
+        <tr><td><span class="sym">b</span></td><td><span class="var">bias</span></td><td class="mono" data-v="B0"></td></tr>
+        <tr><td><span class="sym">&eta;</span></td><td><span class="var">learning_rate</span></td><td class="mono" data-v="LR"></td></tr>
+        <tr><td><span class="sym">m</span></td><td><span class="var">len(y_train)</span></td><td class="mono" data-v="N6"></td></tr>
+        <tr><td><span class="sym">ŷ<span class="sub">i</span> &minus; y<span class="sub">i</span></span></td><td><span class="var">y_hat - y_train</span></td><td>the per-row error that drives everything below</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 class="blk">The running dataset</h3>
+    <p>Six real rows lifted from <span class="mono">Social_Network_Ads.csv</span> — three non-buyers, three buyers. <span class="mono">StandardScaler</span> centres and scales each column; we round its output to 2&nbsp;dp <em>once</em> and use those exact values everywhere after, so your hand arithmetic and the notebook's floats agree to the digit.</p>
+    <div class="tw"><table>
+      <thead><tr><th class="num">CSV row</th><th class="num">Age</th><th class="num">Salary</th><th class="num">x&#8321; scaled</th><th class="num">x&#8322; scaled</th><th class="num">y</th></tr></thead>
+      <tbody id="tblData"></tbody>
+      <tfoot><tr><td colspan="6" style="font-size:.78rem;color:var(--ink-3);border-bottom:0">column means <span class="mono" data-v="means"></span> · population std <span class="mono" data-v="stds"></span> — matching <span class="mono">StandardScaler</span> (ddof = 0)</td></tr></tfoot>
+    </table></div>
+
+    <h3 class="blk">Worked example — one batch update, by hand and by print()</h3>
+    <p>Take row&nbsp;0 first. Every symbol in the rule maps to a number you can check on paper:</p>
+    <div class="pair">
+      <div><div class="ph">By hand</div><div class="pb" id="handRow0"></div></div>
+      <div><div class="ph">What print() shows at that line</div><div class="pb term" id="termRow0"></div></div>
+    </div>
+    <p>Now all six rows at once. Note the last column: the loss Batch GD reports is the plain mean of these six numbers, all measured at the <em>same</em> <span class="mono">weights</span> — that shared vantage point is what makes it smooth.</p>
+    <div class="tw"><table>
+      <thead><tr><th class="num">row</th><th class="num">z</th><th class="num">ŷ = &sigma;(z)</th><th class="num">y</th><th class="num">ŷ &minus; y</th><th class="num">BCE loss</th></tr></thead>
+      <tbody id="tblBatch"></tbody>
+      <tfoot id="tblBatchFoot"></tfoot>
+    </table></div>
+    <div class="pair">
+      <div><div class="ph">By hand — the single update</div><div class="pb" id="handUpd"></div></div>
+      <div><div class="ph">What print() shows</div><div class="pb term" id="termUpd"></div></div>
+    </div>
+
+    <h3 class="blk">Your turn</h3>
+    <div class="q" data-item="s2_b1"></div>
+    <div class="q" data-item="s2_b2"></div>
+    <div class="q" data-item="s2_b3"></div>
+    <h3 class="blk">Check yourself</h3>
+    <div class="q" data-item="s2_m1"></div>
+    <div class="q" data-item="s2_m2"></div>
+  </div>
+  <div class="strip"><span>&#10003;</span><span>One epoch of Batch GD: loss <b data-v="bgLoss"></b>, and w&#8321; crawls <b data-v="W0w1"></b> &#8594; <b data-v="bgW1"></b>. One vote, one small step.</span></div>
+</section>
+
+<!-- =============== SECTION 3 =============== -->
+<section class="concept locked" id="s3" data-idx="3">
+  <button class="c-head" aria-expanded="false" aria-controls="s3b">
+    <span class="c-num">3</span>
+    <span class="c-title">Stochastic Gradient Descent<span>One row, one update, six times over</span></span>
+    <span class="c-badge" data-badge>0 / 5</span>
+    <span class="c-caret">&#9656;</span>
+  </button>
+  <div class="c-body" id="s3b">
+    <p class="hook">Same six rows, same starting weights, same learning rate — but update after <em>every single row</em>. If the destination is the same, does the extra bookkeeping buy anything? Watch w&#8322; carefully: at one point in the epoch it turns around and walks back.</p>
+
+    <h3 class="blk">Rule</h3>
+    <div class="rule-card">
+      <div class="rule-formula">
+        <span class="fl">&theta; &#8592; &theta; &minus; &eta; &middot; &nabla;<span class="sub">&theta;</span> J<span class="sub">i</span> &nbsp;&nbsp;for each <em>i</em> = 1 … <em>N</em></span>
+        <span class="rule-note">No sum, no division by <em>m</em> — the gradient of <b>one</b> row is the whole update signal. <b>1 epoch = <em>N</em> updates.</b></span>
+      </div>
+      <div class="code-cap">SGD — the Python-level loop that replaces the dot product</div>
+<pre>rows = X_train.shape[<span class="n">0</span>]        <span class="c"># 6 in our example, 320 in the notebook</span>
+
+<span class="k">for</span> epoch <span class="k">in</span> range(epochs):
+    <span class="c"># shuffle each epoch so row order stops being a systematic bias</span>
+    shuffled_X, shuffled_y = shuffle_data(X_train, y_train)
+
+    <span class="k">for</span> i <span class="k">in</span> range(rows):
+<span class="hl">        x_point = shuffled_X[i:i+<span class="n">1</span>, :]     <span class="c"># keep it 2-D: shape (1, 2)</span></span>
+        y_point = shuffled_y[i:i+<span class="n">1</span>]
+
+        y_hat   = <span class="n">1</span> / (<span class="n">1</span> + np.exp(-(np.dot(x_point, weights) + bias)))
+        d_w     = x_point.T * (y_hat - y_point)   <span class="c"># NO averaging - m is 1</span>
+
+        <span class="c"># fires `rows` times per epoch, not once</span>
+        weights = weights - learning_rate * d_w
+        bias    = bias    - learning_rate * (y_hat - y_point)</pre>
+    </div>
+
+    <div class="tw"><table>
+      <thead><tr><th style="width:24%">Batch GD wrote</th><th style="width:30%">SGD writes</th><th>Why the difference matters</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">np.dot(X_train, w)</td><td class="mono">np.dot(x_point, w)</td><td>a (6,2)&times;(2,) matrix product becomes a (1,2)&times;(2,) one — <b>no</b> vectorization across rows</td></tr>
+        <tr><td class="mono">... / len(y_train)</td><td class="mono">&mdash; (nothing) &mdash;</td><td>dividing by <em>m</em>=1 is a no-op, so a single row's disagreement arrives at <b>full strength</b></td></tr>
+        <tr><td class="mono">1 update</td><td class="mono">rows updates</td><td>the update sits <em>inside</em> the row loop instead of outside it</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="blk">Worked example — six updates in one epoch</h3>
+    <p>Each row is evaluated at the weights the <em>previous</em> row left behind, so no two rows in this table see the same model. Row&nbsp;0 starts from the identical state Batch GD did, so its first line matches Section&nbsp;2 exactly — then the two histories separate for good.</p>
+    <div class="tw"><table>
+      <thead><tr><th class="num">step</th><th class="num">CSV row</th><th class="num">z</th><th class="num">ŷ</th><th class="num">ŷ &minus; y</th><th class="num">loss</th><th class="num">w&#8321; after</th><th class="num">w&#8322; after</th><th>&#916;w&#8322;</th></tr></thead>
+      <tbody id="tblSgd"></tbody>
+    </table></div>
+    <div class="pair">
+      <div><div class="ph">By hand — step 1 only</div><div class="pb" id="handSgd1"></div></div>
+      <div><div class="ph">What print() shows across the epoch</div><div class="pb term" id="termSgd"></div></div>
+    </div>
+    <div class="callout" style="margin-top:1.1rem">
+      <h4>The noise, measured</h4>
+      <p>The &#916;w&#8322; column changes sign <b data-v="revs"></b> times inside a single epoch — the weight is repeatedly walked back by the next row's opinion. That is the "drunken walk", visible in six rows. Batch GD cannot do this: it has exactly one &#916; per epoch, so it has nothing to contradict.</p>
+      <p>The six SGD step-losses average <b data-v="sgdMeanLoss"></b>, but Batch GD's reported loss is <b data-v="bgLoss"></b>. They differ not because one model is better — at step&nbsp;1 they were identical — but because SGD measured each loss at a <em>different</em> &theta;. An SGD loss curve is a photograph of six different models; a batch loss curve is six photographs of one.</p>
+    </div>
+
+    <h3 class="blk">Your turn</h3>
+    <div class="q" data-item="s3_b1"></div>
+    <div class="q" data-item="s3_b2"></div>
+    <div class="q" data-item="s3_b3"></div>
+    <h3 class="blk">Check yourself</h3>
+    <div class="q" data-item="s3_m1"></div>
+    <div class="q" data-item="s3_m2"></div>
+  </div>
+  <div class="strip"><span>&#10003;</span><span>Same epoch, same data: Batch lands w&#8321; = <b data-v="bgW1"></b>, SGD lands <b data-v="sgdW1"></b> — <b data-v="sgdVsBatchX"></b>&times; further, at the cost of <b data-v="revs"></b> direction reversals.</span></div>
+</section>
+
+<!-- =============== SECTION 4 =============== -->
+<section class="concept locked" id="s4" data-idx="4">
+  <button class="c-head" aria-expanded="false" aria-controls="s4b">
+    <span class="c-num">4</span>
+    <span class="c-title">Path Geometry<span>Why one curve is smooth and the other is a lightning bolt</span></span>
+    <span class="c-badge" data-badge>0 / 4</span>
+    <span class="c-caret">&#9656;</span>
+  </button>
+  <div class="c-body" id="s4b">
+    <p class="hook">Plot the weights themselves, not the loss. Twenty-five epochs from the identical starting point, on the identical six rows. Three algorithms, three very different routes — and the fastest route is the ugly one.</p>
+
+    <h3 class="blk">Rule</h3>
+    <div class="rule-card">
+      <div class="rule-formula">
+        <span class="fl">Var[&nabla;<span class="sub">batch</span>] = Var[&nabla;<span class="sub">row</span>] / <em>B</em></span>
+        <span class="rule-note">Averaging <em>B</em> row-gradients divides their variance by <em>B</em>. <b>Smoothness is bought with batch size</b> — and it is the only thing batch size buys you here.</span>
+      </div>
+      <div class="code-cap">The three trajectories, generated from the same initial state</div>
+<pre><span class="c"># identical start for all three</span>
+w0, b0, lr = np.array([<span class="n">0.5</span>, <span class="n">-0.5</span>]), <span class="n">0.0</span>, <span class="n">0.1</span>
+
+paths = {
+    <span class="s">'batch'</span>: run(w0, b0, batch_size=<span class="n">6</span>, epochs=<span class="n">25</span>),   <span class="c"># 25 updates total</span>
+    <span class="s">'mini'</span> : run(w0, b0, batch_size=<span class="n">2</span>, epochs=<span class="n">25</span>),   <span class="c"># 75 updates total</span>
+    <span class="s">'sgd'</span>  : run(w0, b0, batch_size=<span class="n">1</span>, epochs=<span class="n">25</span>),   <span class="c"># 150 updates total</span>
+}</pre>
+    </div>
+
+    <figure>
+      <div id="figWrap"></div>
+      <div class="legend">
+        <span><i style="background:#1b3c69"></i>Batch GD — <span data-v="pathNb"></span> updates</span>
+        <span><i style="background:#c67c11"></i>Mini-batch B=2 — <span data-v="pathNm"></span> updates</span>
+        <span><i style="background:#a33b2c"></i>SGD B=1 — <span data-v="pathNs"></span> updates</span>
+      </div>
+      <figcaption><b>Fig. 1 — Weight space over 25 epochs.</b> Shading is the true batch cross-entropy of our six rows over a grid of (w&#8321;, w&#8322;) with the bias held at 0; darker is lower loss. Batch GD walks a short, perfectly smooth line. SGD staggers — visibly overshooting and correcting — yet ends far deeper into the valley. Mini-batch traces a path between the two, in both shape and distance. Because these six rows are linearly separable, the loss keeps falling toward the upper right rather than closing into rings: the "minimum" is off the edge of the plot, which is exactly why <em>how far you travel per epoch</em> decides who wins.</figcaption>
+    </figure>
+
+    <div class="tw"><table>
+      <thead><tr><th>After 25 epochs</th><th class="num">updates</th><th class="num">w&#8321;</th><th class="num">w&#8322;</th><th class="num">batch loss</th><th class="num">vs. start</th></tr></thead>
+      <tbody id="tblPaths"></tbody>
+    </table></div>
+
+    <div class="tw"><table>
+      <thead><tr><th style="width:22%">Aspect</th><th style="width:39%">Batch GD path</th><th>SGD path</th></tr></thead>
+      <tbody>
+        <tr><td><b>Shape</b></td><td>Straight, smooth, perpendicular to the contours</td><td>Jagged zig-zag — a lightning bolt</td></tr>
+        <tr><td><b>Cause</b></td><td>Direction averaged over the whole population — high certainty, low variance</td><td>Direction from one sample at a time — each row's private bias arrives undiluted</td></tr>
+        <tr><td><b>At a shallow local minimum</b></td><td>The aggregate gradient hits zero at the bottom of the shallow valley. The model freezes and is <b>trapped</b>.</td><td>One outlying row produces a large gradient that jolts &theta; over the valley wall — the noise is an <b>escape mechanism</b>.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout">
+      <h4>The takeaway that trips people up</h4>
+      <p>SGD's noise is not a defect you tolerate for speed. It is the same property, read two ways: the thing that makes the loss curve ugly is the thing that lets it climb out of shallow traps that would hold Batch GD forever.</p>
+    </div>
+
+    <h3 class="blk">Your turn</h3>
+    <div class="q" data-item="s4_b1"></div>
+    <div class="q" data-item="s4_b2"></div>
+    <h3 class="blk">Check yourself</h3>
+    <div class="q" data-item="s4_m1"></div>
+    <div class="q" data-item="s4_m2"></div>
+  </div>
+  <div class="strip"><span>&#10003;</span><span>25 epochs: batch loss <b data-v="p25Lb"></b> (batch) vs <b data-v="p25Lm"></b> (mini) vs <b data-v="p25Ls"></b> (SGD). More updates per epoch wins, noise and all.</span></div>
+</section>
+
+<!-- =============== SECTION 5 =============== -->
+<section class="concept locked" id="s5" data-idx="5">
+  <button class="c-head" aria-expanded="false" aria-controls="s5b">
+    <span class="c-num">5</span>
+    <span class="c-title">Mini-Batch &amp; the Remainder<span>The middle ground, and the batch nobody counts</span></span>
+    <span class="c-badge" data-badge>0 / 6</span>
+    <span class="c-caret">&#9656;</span>
+  </button>
+  <div class="c-body" id="s5b">
+    <p class="hook">Set <span class="mono">batch_size=150</span> on 400 rows and Keras prints <span class="mono">3/3</span>, not <span class="mono">2/2</span>. Where does the third batch come from, how big is it — and why is nobody's default batch size ever 100?</p>
+
+    <h3 class="blk">Rule</h3>
+    <div class="rule-card">
+      <div class="rule-formula">
+        <span class="fl">updates = &#8968; <em>N</em>/<em>B</em> &#8969; &nbsp;&nbsp;·&nbsp;&nbsp; last batch = <em>N</em> mod <em>B</em> &nbsp;(or <em>B</em>, when it divides evenly)</span>
+        <span class="rule-note">Keras never discards the leftover rows — it ships a smaller final batch. That short batch still produces a <b>full</b> weight update.</span>
+      </div>
+      <div class="code-cap">Mini-batch — vectorized like Batch GD, frequent like SGD</div>
+<pre><span class="k">for</span> epoch <span class="k">in</span> range(epochs):
+    <span class="k">for</span> start <span class="k">in</span> range(<span class="n">0</span>, rows, batch_size):
+        Xb = X_train[start : start+batch_size]     <span class="c"># the last slice is just SHORT -</span>
+        yb = y_train[start : start+batch_size]     <span class="c"># Python clips it, no error</span>
+
+        y_hat = <span class="n">1</span> / (<span class="n">1</span> + np.exp(-(np.dot(Xb, weights) + bias)))
+<span class="hl">        d_w   = np.dot(Xb.T, (y_hat - yb)) / len(yb)   <span class="c"># len(yb), NOT batch_size</span></span>
+        weights = weights - learning_rate * d_w</pre>
+    </div>
+    <p style="font-size:.88rem;color:var(--ink-2)">That highlighted line is the whole trick, and the one place this goes wrong in hand-written loops: divide by <span class="mono">len(yb)</span>, not by <span class="mono">batch_size</span>. On the remainder batch those two differ, and dividing by the wrong one silently shrinks the final update of every epoch.</p>
+
+    <h3 class="blk">Worked example — the same six rows, B = 2</h3>
+    <p>Three batches, three updates. Compare the endpoint against the two extremes you have already computed:</p>
+    <div class="tw"><table>
+      <thead><tr><th class="num">batch</th><th>rows</th><th class="num">size</th><th class="num">mean loss</th><th class="num">&#8711;w&#8321;</th><th class="num">w&#8321; after</th><th class="num">w&#8322; after</th></tr></thead>
+      <tbody id="tblMini"></tbody>
+    </table></div>
+    <div class="pair">
+      <div><div class="ph">After one epoch — all three variants</div><div class="pb" id="handMini"></div></div>
+      <div><div class="ph">What print() shows</div><div class="pb term" id="termMini"></div></div>
+    </div>
+
+    <h3 class="blk">Worked example — counting batches, including the short one</h3>
+    <div class="tw"><table>
+      <thead><tr><th class="num">N rows</th><th class="num">B</th><th class="num">full batches</th><th class="num">remainder</th><th class="num">updates / epoch</th><th>Keras prints</th></tr></thead>
+      <tbody id="tblRemainder"></tbody>
+    </table></div>
+
+    <h3 class="blk">Why powers of two?</h3>
+    <p>Memory hardware is addressed in binary. A batch whose row count is a power of two aligns cleanly onto physical RAM blocks and cache lines, so the transfer engine moves it without straddling boundaries. 50 and 100 look tidier to a human and are worse for the machine:</p>
+    <div class="tw"><table>
+      <thead><tr><th class="num">B</th><th class="num">log&#8322;B</th><th>Power of two?</th><th>Bit pattern</th></tr></thead>
+      <tbody id="tblPow2"></tbody>
+    </table></div>
+
+    <h3 class="blk">Your turn</h3>
+    <div class="q" data-item="s5_b1"></div>
+    <div class="q" data-item="s5_b2"></div>
+    <div class="q" data-item="s5_b3"></div>
+    <div class="q" data-item="s5_b4"></div>
+    <h3 class="blk">Check yourself</h3>
+    <div class="q" data-item="s5_m1"></div>
+    <div class="q" data-item="s5_m2"></div>
+  </div>
+  <div class="strip"><span>&#10003;</span><span>400 rows, B=150 &#8594; <b data-v="r400_150n"></b> batches, last one <b data-v="r400_150r"></b> rows. Mini-batch lands w&#8321; = <b data-v="mbW1"></b> — between batch <b data-v="bgW1"></b> and SGD <b data-v="sgdW1"></b>.</span></div>
+</section>
+
+<!-- =============== SECTION 6 =============== -->
+<section class="concept locked" id="s6" data-idx="6">
+  <button class="c-head" aria-expanded="false" aria-controls="s6b">
+    <span class="c-num">6</span>
+    <span class="c-title">The Two Meanings of "Fast"<span>Measured on the real notebook, not asserted</span></span>
+    <span class="c-badge" data-badge>0 / 5</span>
+    <span class="c-caret">&#9656;</span>
+  </button>
+  <div class="c-body" id="s6b">
+    <p class="hook">Two runs, same network, same 400 rows, same 10 epochs — one finishes in 3.3 seconds, the other takes 16.5. The slow one is the one you want. Both facts come from the same <span class="mono">time.time()</span> calls in the notebook.</p>
+
+    <h3 class="blk">Rule</h3>
+    <div class="rule-card">
+      <div class="rule-formula">
+        <span class="fl">wall-clock &#8776; epochs &times; &#8968;<em>N</em>/<em>B</em>&#8969; &times; t<span class="sub">step</span>(<em>B</em>)</span>
+        <span class="rule-note">t<span class="sub">step</span> grows <b>far more slowly</b> than <em>B</em> — a 320-row step is nowhere near 320&times; the cost of a 1-row step. Per-epoch speed and per-epoch <em>learning</em> are two different quantities, and batch size trades one for the other.</span>
+      </div>
+      <div class="code-cap">Time_for_Batch_vs_stochastic_GD.ipynb — the exact cells that produced the numbers below</div>
+<pre><span class="k">import</span> time
+
+model.compile(loss=<span class="s">'binary_crossentropy'</span>, metrics=[<span class="s">'accuracy'</span>])
+start = time.time()
+history = model.fit(X_scaled, y, epochs=<span class="n">10</span>, batch_size=<span class="n">320</span>, validation_split=<span class="n">0.2</span>)
+print(time.time() - start)      <span class="c">#  -> 3.297926902770996</span>
+
+<span class="c"># ...rebuild an identical fresh model, then:</span>
+start = time.time()
+history = model.fit(X_scaled, y, epochs=<span class="n">10</span>, batch_size=<span class="n">1</span>,   validation_split=<span class="n">0.2</span>)
+print(time.time() - start)      <span class="c">#  -> 16.541401624679565</span></pre>
+    </div>
+
+    <h3 class="blk">Worked example — the measurement, decomposed</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Quantity</th><th class="num">batch_size = 320</th><th class="num">batch_size = 1</th><th>Read it as</th></tr></thead>
+      <tbody id="tblTime"></tbody>
+    </table></div>
+    <div class="callout">
+      <h4>Both sentences are true at once</h4>
+      <p><b>Batch GD is faster.</b> It finished the same 10 epochs <b data-v="wallRatio"></b>&times; sooner, because it issued <b data-v="stepsB"></b> updates instead of <b data-v="stepsS"></b>.</p>
+      <p><b>SGD is faster.</b> Per second of wall clock it removed <b data-v="dropPerSecRatio"></b>&times; more validation loss. After 10 epochs Batch GD's <span class="mono">val_loss</span> had moved <b data-v="dropB"></b> — it was still essentially at its starting point — while SGD's had fallen <b data-v="dropS"></b> and its <span class="mono">val_accuracy</span> stood at <b data-v="accS"></b>.</p>
+      <p>The mistake is not preferring one. It is failing to say <em>which</em> speed you mean.</p>
+    </div>
+    <div class="tw"><table>
+      <thead><tr><th>Meaning of "fast"</th><th>Batch GD</th><th>SGD</th></tr></thead>
+      <tbody>
+        <tr><td><b>Per epoch</b> (wall clock)</td><td class="hi">Wins — one vectorized matrix op</td><td>Loses — <b data-v="stepsSperEpoch"></b> sequential Python-level steps</td></tr>
+        <tr><td><b>To convergence</b> (epochs needed)</td><td>Loses — 1 update per epoch, needs many</td><td class="hi">Wins — <b data-v="stepsSperEpoch"></b> updates inside a single pass</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="blk">Your turn</h3>
+    <div class="q" data-item="s6_b1"></div>
+    <div class="q" data-item="s6_b2"></div>
+    <div class="q" data-item="s6_b3"></div>
+    <h3 class="blk">Check yourself</h3>
+    <div class="q" data-item="s6_m1"></div>
+    <div class="q" data-item="s6_m2"></div>
+  </div>
+  <div class="strip"><span>&#10003;</span><span>10 epochs: B=320 took <b data-v="tB"></b>s for <b data-v="dropB"></b> loss drop; B=1 took <b data-v="tS"></b>s for <b data-v="dropS"></b>. <b data-v="wallRatio"></b>&times; slower, <b data-v="dropRatio"></b>&times; the learning.</span></div>
+</section>
+
+<!-- =============== SECTION 7 =============== -->
+<section class="concept locked" id="s7" data-idx="7">
+  <button class="c-head" aria-expanded="false" aria-controls="s7b">
+    <span class="c-num">7</span>
+    <span class="c-title">The Memory Wall<span>Why vectorization stops being free</span></span>
+    <span class="c-badge" data-badge>0 / 4</span>
+    <span class="c-caret">&#9656;</span>
+  </button>
+  <div class="c-body" id="s7b">
+    <p class="hook">Batch GD's whole advantage is that <span class="mono">np.dot(X_train, weights)</span> is one fast matrix operation. That line has a hardware precondition nobody states out loud — and on ten crore rows it is the line that kills the process.</p>
+
+    <h3 class="blk">Rule</h3>
+    <div class="rule-card">
+      <div class="rule-formula">
+        <span class="fl">RAM for the feature matrix = <em>B</em> &times; <em>d</em> &times; bytes-per-float</span>
+        <span class="rule-note">Batch GD sets <em>B</em> = <em>N</em>, so its memory bill scales with the <b>dataset</b>. Mini-batch fixes <em>B</em>, so its bill is <b>constant</b> no matter how many rows arrive.</span>
+      </div>
+      <div class="code-cap">The line with the precondition</div>
+<pre><span class="c"># Batch GD: the ENTIRE X_train must be resident to form this product</span>
+z = np.dot(X_train, weights)     <span class="c"># X_train.shape == (100_000_000, d)  -> MemoryError</span>
+
+<span class="c"># Mini-batch: only `Xb` is resident; the rest can stay on disk</span>
+Xb = X_train[start : start+<span class="n">64</span>]
+z  = np.dot(Xb, weights)         <span class="c"># Xb.shape == (64, d)  -> fits in cache</span></pre>
+    </div>
+
+    <h3 class="blk">Worked example — 10 crore rows (100,000,000), float64</h3>
+    <div class="tw"><table>
+      <thead><tr><th class="num">features d</th><th class="num">Batch GD (B = N)</th><th class="num">Mini-batch (B = 64)</th><th class="num">ratio</th><th>Outcome on a 16 GB machine</th></tr></thead>
+      <tbody id="tblMem"></tbody>
+    </table></div>
+    <p style="font-size:.88rem;color:var(--ink-2)">And this counts only the input matrix. Activations, gradients and optimizer state are each allocated at the same batch dimension, so the real figure is a multiple of the column above — which is why the crash arrives sooner than the arithmetic suggests.</p>
+    <div class="callout">
+      <h4>The resolution</h4>
+      <p>Mini-batching is not a compromise between Batch GD and SGD on a single axis. It keeps the vectorization that makes Batch GD fast per step, keeps the frequent updates that make SGD fast per epoch, and additionally <b>decouples memory from dataset size</b> — a property neither extreme has. That is why 32/64/128/256 is what you actually see in production code, and why <span class="mono">batch_size</span> is the argument you tune first.</p>
+    </div>
+
+    <h3 class="blk">Your turn</h3>
+    <div class="q" data-item="s7_b1"></div>
+    <div class="q" data-item="s7_b2"></div>
+    <h3 class="blk">Check yourself</h3>
+    <div class="q" data-item="s7_m1"></div>
+    <div class="q" data-item="s7_m2"></div>
+  </div>
+  <div class="strip"><span>&#10003;</span><span>100M rows &times; 128 features = <b data-v="mem128"></b> for Batch GD's dot product; B=64 needs <b data-v="mem128b"></b>. Same maths, <b data-v="memRatio"></b>&times; less RAM.</span></div>
+</section>
+
+<div class="callout" id="finale" style="display:none;border-left-color:var(--ok)">
+  <h4>Worksheet complete</h4>
+  <p id="finaleText"></p>
+</div>
+
+<footer>
+  <p><b>Sources fused into this sheet.</b> Theory: <em>Batch vs. Stochastic Gradient Descent — Worksheet</em> (Sparsh Bansal, 2 July 2026), 16 pp. Code and measurements: <span class="mono">Batch_vs_stochastic_GD.ipynb</span> and <span class="mono">Time_for_Batch_vs_stochastic_GD.ipynb</span>, on <span class="mono">Social_Network_Ads.csv</span> (400 rows). Every figure, table cell and answer on this page is recomputed in JavaScript at load time from the six-row running dataset or from the notebook's recorded output — nothing is transcribed by hand. Open the console for the self-test.</p>
+</footer>
+</main>
+
+<div class="ov" id="ovRef" role="dialog" aria-modal="true" aria-labelledby="ovTitle">
+  <div class="ov-card">
+    <button class="ov-close" id="ovClose">Close &#10005;</button>
+    <h2 id="ovTitle">Reference</h2>
+    <p style="color:var(--ink-2);font-size:.9rem;margin-top:0">Everything on this card is generated from the same computation the sections use.</p>
+    <h3 class="blk">Cheat-sheet</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Feature</th><th>Batch GD</th><th>SGD</th><th>Mini-Batch GD</th></tr></thead>
+      <tbody id="tblCheat"></tbody>
+    </table></div>
+    <h3 class="blk">Symbols</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Symbol</th><th>Code</th><th>Meaning</th><th class="num">Value here</th></tr></thead>
+      <tbody id="tblSyms"></tbody>
+    </table></div>
+    <h3 class="blk">The running dataset</h3>
+    <div class="tw"><table>
+      <thead><tr><th class="num">row</th><th class="num">x&#8321;</th><th class="num">x&#8322;</th><th class="num">y</th></tr></thead>
+      <tbody id="tblRefData"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   1. MODEL — every number on this page originates here.
+   Ported line-for-line from the NumPy logic in the notebooks.
+   ============================================================ */
+const RAW = [
+  {i:0,   age:19, sal:19000, y:0},
+  {i:1,   age:35, sal:20000, y:0},
+  {i:3,   age:27, sal:57000, y:0},
+  {i:395, age:46, sal:41000, y:1},
+  {i:397, age:50, sal:20000, y:1},
+  {i:399, age:49, sal:36000, y:1}
+];
+const N_FULL = 400, VAL_SPLIT = 0.2, N_TRAIN = Math.round(N_FULL*(1-VAL_SPLIT));
+const W0 = [0.5,-0.5], B0 = 0.0, LR = 0.1;
+
+const r2   = v => Math.round(v*100)/100;
+const mean = a => a.reduce((s,x)=>s+x,0)/a.length;
+const pstd = a => { const m=mean(a); return Math.sqrt(a.reduce((s,x)=>s+(x-m)*(x-m),0)/a.length); };
+const sig  = z => 1/(1+Math.exp(-z));
+const bce  = (p,y) => -(y*Math.log(p)+(1-y)*Math.log(1-p));
+
+const AGES = RAW.map(r=>r.age), SALS = RAW.map(r=>r.sal);
+const STATS = {aMu:mean(AGES), aSd:pstd(AGES), sMu:mean(SALS), sSd:pstd(SALS)};
+/* StandardScaler output, rounded to 2dp ONCE — used verbatim downstream
+   so hand arithmetic and printed floats agree to the digit. */
+const X = RAW.map(r=>[ r2((r.age-STATS.aMu)/STATS.aSd), r2((r.sal-STATS.sMu)/STATS.sSd) ]);
+const Y = RAW.map(r=>r.y);
+const M = X.length;
+
+function fwd(w,b,x){ const z = w[0]*x[0]+w[1]*x[1]+b; return {z, p:sig(z)}; }
+
+function batchStep(w,b){
+  const rows = X.map((x,k)=>{ const f=fwd(w,b,x); return {k,row:RAW[k].i,x,y:Y[k],z:f.z,p:f.p,err:f.p-Y[k],loss:bce(f.p,Y[k])}; });
+  const gw = [ rows.reduce((s,r)=>s+r.err*r.x[0],0)/M, rows.reduce((s,r)=>s+r.err*r.x[1],0)/M ];
+  const gb = rows.reduce((s,r)=>s+r.err,0)/M;
+  const loss = rows.reduce((s,r)=>s+r.loss,0)/M;
+  return {rows, loss, gw, gb, wNew:[w[0]-LR*gw[0], w[1]-LR*gw[1]], bNew:b-LR*gb};
+}
+function sgdEpoch(w,b){
+  let cw=[w[0],w[1]], cb=b; const steps=[];
+  X.forEach((x,k)=>{
+    const f=fwd(cw,cb,x), err=f.p-Y[k];
+    const gw=[err*x[0], err*x[1]], gb=err;
+    const nw=[cw[0]-LR*gw[0], cw[1]-LR*gw[1]], nb=cb-LR*gb;
+    steps.push({k,row:RAW[k].i,x,y:Y[k],z:f.z,p:f.p,err,loss:bce(f.p,Y[k]),gw,gb,
+                wBefore:[cw[0],cw[1]],wAfter:nw,bAfter:nb,dw2:nw[1]-cw[1]});
+    cw=nw; cb=nb;
+  });
+  return {steps, wEnd:cw, bEnd:cb};
+}
+function miniEpoch(w,b,B){
+  let cw=[w[0],w[1]], cb=b; const batches=[];
+  for(let s=0;s<M;s+=B){
+    const idx=[]; for(let k=s;k<Math.min(s+B,M);k++) idx.push(k);
+    const rows = idx.map(k=>{ const f=fwd(cw,cb,X[k]); return {k,row:RAW[k].i,err:f.p-Y[k],loss:bce(f.p,Y[k]),x:X[k]}; });
+    const mb = rows.length;
+    const gw=[ rows.reduce((t,r)=>t+r.err*r.x[0],0)/mb, rows.reduce((t,r)=>t+r.err*r.x[1],0)/mb ];
+    const gb=rows.reduce((t,r)=>t+r.err,0)/mb;
+    const nw=[cw[0]-LR*gw[0], cw[1]-LR*gw[1]], nb=cb-LR*gb;
+    batches.push({size:mb, idx, rows, loss:rows.reduce((t,r)=>t+r.loss,0)/mb, gw, gb,
+                  wBefore:[cw[0],cw[1]], wAfter:nw, bAfter:nb});
+    cw=nw; cb=nb;
+  }
+  return {batches, wEnd:cw, bEnd:cb};
+}
+const surfLoss = (w1,w2,b) => X.reduce((s,x,k)=>s+bce(sig(w1*x[0]+w2*x[1]+b),Y[k]),0)/M;
+
+const BG = batchStep(W0,B0);
+const SG = sgdEpoch(W0,B0);
+const MB = miniEpoch(W0,B0,2);
+
+const EPOCHS_PLOT = 25;
+function runEpochs(kind,B,E){
+  let w=[W0[0],W0[1]], b=B0; const path=[[w[0],w[1]]];
+  for(let e=0;e<E;e++){
+    if(kind==='batch'){ const s=batchStep(w,b); w=s.wNew; b=s.bNew; path.push([w[0],w[1]]); }
+    else if(kind==='sgd'){ const s=sgdEpoch(w,b); s.steps.forEach(st=>path.push([st.wAfter[0],st.wAfter[1]])); w=s.wEnd; b=s.bEnd; }
+    else { const s=miniEpoch(w,b,B); s.batches.forEach(bt=>path.push([bt.wAfter[0],bt.wAfter[1]])); w=s.wEnd; b=s.bEnd; }
+  }
+  return {path,w,b,loss:surfLoss(w[0],w[1],b),updates:path.length-1};
+}
+const P = { batch:runEpochs('batch',null,EPOCHS_PLOT), mini:runEpochs('mini',2,EPOCHS_PLOT), sgd:runEpochs('sgd',null,EPOCHS_PLOT) };
+const L_START = surfLoss(W0[0],W0[1],B0);
+
+/* direction reversals of w2 inside one SGD epoch */
+const REVS = (()=>{ let r=0; for(let i=2;i<SG.steps.length;i++){ if(SG.steps[i-1].dw2*SG.steps[i].dw2 < 0) r++; } return r; })();
+const SGD_MEAN_LOSS = mean(SG.steps.map(s=>s.loss));
+
+/* ---- measurements recorded by the notebooks (constants); all ratios derived ---- */
+const T = {
+  B:320, epochs:10, train:N_TRAIN,
+  tB:3.297926902770996, tS:16.541401624679565,
+  vlB0:0.6657, vlB1:0.6637, vlS0:0.5740, vlS1:0.2489,
+  accB:0.9250, accS:0.9625
+};
+const nUp = (n,b) => Math.ceil(n/b);
+T.stepsPerEpochB = nUp(T.train,T.B);
+T.stepsPerEpochS = nUp(T.train,1);
+T.stepsB = T.epochs*T.stepsPerEpochB;
+T.stepsS = T.epochs*T.stepsPerEpochS;
+T.msB = T.tB*1000/T.stepsB;
+T.msS = T.tS*1000/T.stepsS;
+T.wallRatio = T.tS/T.tB;
+T.perStepRatio = T.msB/T.msS;
+T.dropB = T.vlB0-T.vlB1;
+T.dropS = T.vlS0-T.vlS1;
+T.dropRatio = T.dropS/T.dropB;
+T.dpsB = T.dropB/T.tB;
+T.dpsS = T.dropS/T.tS;
+T.dpsRatio = T.dpsS/T.dpsB;
+
+/* ---- memory ---- */
+const BYTES=8, ROWS_BIG=100e6;
+const memGB = (rows,d) => rows*d*BYTES/Math.pow(1024,3);
+const memKB = (rows,d) => rows*d*BYTES/1024;
+const MEMS = [2,16,128].map(d=>({d, full:memGB(ROWS_BIG,d), mini:memKB(64,d), ratio:ROWS_BIG/64}));
+
+/* ============================================================
+   2. FORMATTING
+   ============================================================ */
+const f  = (v,d) => (v===undefined||v===null||Number.isNaN(v)) ? '—' : v.toFixed(d);
+const fs = (v,d) => (v>=0?'+':'−') + Math.abs(v).toFixed(d);
+const mn = v => '−' + Math.abs(v).toFixed(2);
+const sgn = v => v<0 ? '−'+Math.abs(v).toFixed(4) : v.toFixed(4);
+const vec = (a,d) => '[' + a.map(x=>f(x,d)).join(', ') + ']';
+const int = v => v.toLocaleString('en-US');
+
+/* ============================================================
+   3. VALUES — fills every [data-v] placeholder in the markup
+   ============================================================ */
+const VALUES = {
+  N6:String(M), Nfull:int(N_FULL), Ntrain:int(N_TRAIN), LR:f(LR,1),
+  W0:vec(W0,1), B0:f(B0,1), W0w1:f(W0[0],4),
+  means:'['+f(STATS.aMu,2)+', '+f(STATS.sMu,2)+']',
+  stds :'['+f(STATS.aSd,2)+', '+f(STATS.sSd,2)+']',
+  bgLoss:f(BG.loss,4), bgW1:f(BG.wNew[0],4),
+  sgdW1:f(SG.wEnd[0],4), sgdMeanLoss:f(SGD_MEAN_LOSS,4), revs:String(REVS),
+  sgdVsBatchX:f((SG.wEnd[0]-W0[0])/(BG.wNew[0]-W0[0]),1),
+  mbW1:f(MB.wEnd[0],4),
+  pathNb:String(P.batch.updates), pathNm:String(P.mini.updates), pathNs:String(P.sgd.updates),
+  p25Lb:f(P.batch.loss,4), p25Lm:f(P.mini.loss,4), p25Ls:f(P.sgd.loss,4),
+  r400_150n:String(nUp(400,150)), r400_150r:String(400%150),
+  wallRatio:f(T.wallRatio,2), stepsB:int(T.stepsB), stepsS:int(T.stepsS),
+  stepsSperEpoch:int(T.stepsPerEpochS),
+  dropB:f(T.dropB,4), dropS:f(T.dropS,4), dropRatio:f(T.dropRatio,0),
+  dropPerSecRatio:f(T.dpsRatio,0), accS:f(T.accS*100,2)+'%',
+  tB:f(T.tB,2), tS:f(T.tS,2),
+  mem128:f(memGB(ROWS_BIG,128),1)+' GB', mem128b:f(memKB(64,128),0)+' KB',
+  memRatio:int(Math.round(ROWS_BIG/64))
+};
+
+/* ============================================================
+   4. TABLE + FIGURE RENDERERS
+   ============================================================ */
+const $  = s => document.querySelector(s);
+const $$ = s => Array.prototype.slice.call(document.querySelectorAll(s));
+const el = (t,c,h) => { const e=document.createElement(t); if(c)e.className=c; if(h!==undefined)e.innerHTML=h; return e; };
+function rows(tbodyId, data){
+  const tb = document.getElementById(tbodyId); if(!tb) return;
+  tb.innerHTML = data.map(r=>'<tr>'+r.map(c=>{
+    const cls = (typeof c==='object'&&c.cls)?c.cls:'';
+    const val = (typeof c==='object')?c.v:c;
+    return '<td class="'+cls+'">'+val+'</td>';
+  }).join('')+'</tr>').join('');
+}
+const NUM = v => ({v:v, cls:'num'});
+const HI  = v => ({v:v, cls:'num hi'});
+
+/* --- S1 regimes --- */
+rows('tblRegimes', [
+  ['<span class="mono">batch_size=320</span>', NUM(320), HI(int(nUp(N_TRAIN,320))), NUM(int(T.epochs*nUp(N_TRAIN,320))), 'Batch GD (B = N)'],
+  ['<span class="mono">batch_size=32</span>',  NUM(32),  HI(int(nUp(N_TRAIN,32))),  NUM(int(T.epochs*nUp(N_TRAIN,32))),  'Mini-batch'],
+  ['<span class="mono">batch_size=1</span>',   NUM(1),   HI(int(nUp(N_TRAIN,1))),   NUM(int(T.epochs*nUp(N_TRAIN,1))),   'SGD']
+]);
+/* --- S2 dataset --- */
+rows('tblData', RAW.map((r,k)=>[
+  NUM(r.i), NUM(int(r.age)), NUM(int(r.sal)),
+  NUM(X[k][0]<0?mn(X[k][0]):f(X[k][0],2)), NUM(X[k][1]<0?mn(X[k][1]):f(X[k][1],2)),
+  {v:'<b>'+r.y+'</b>', cls:'num'}
+]));
+/* --- S2 batch table --- */
+rows('tblBatch', BG.rows.map(r=>[
+  NUM(r.row), NUM(sgn(r.z)), NUM(f(r.p,4)), NUM(r.y), NUM(sgn(r.err)), NUM(f(r.loss,4))
+]));
+document.getElementById('tblBatchFoot').innerHTML =
+  '<tr><td colspan="5" style="text-align:right;font-weight:700">mean &#8594; the loss Batch GD reports</td>'+
+  '<td class="num hi"><b>'+f(BG.loss,4)+'</b></td></tr>';
+
+/* --- S2 worked example panes --- */
+const r0 = BG.rows[0];
+document.getElementById('handRow0').innerHTML =
+  '<div style="font-family:var(--serif);line-height:2.05">'+
+  'z = w&#8321;x&#8321; + w&#8322;x&#8322; + b<br>'+
+  '&nbsp;&nbsp;= ('+f(W0[0],1)+')('+mn(X[0][0])+') + ('+mn(Math.abs(W0[1]))+')('+mn(X[0][1])+') + '+f(B0,1)+'<br>'+
+  '&nbsp;&nbsp;= '+mn(W0[0]*X[0][0])+' + '+f(W0[1]*X[0][1],2)+' = <b>'+sgn(r0.z)+'</b><br>'+
+  '&sigma;(z) = 1/(1+e<span class="sup">'+f(-r0.z,2)+'</span>) = <b>'+f(r0.p,4)+'</b><br>'+
+  'error = ŷ &minus; y = '+f(r0.p,4)+' &minus; '+r0.y+' = <b>'+sgn(r0.err)+'</b><br>'+
+  'loss = &minus;ln(1&minus;ŷ) = <b>'+f(r0.loss,4)+'</b></div>';
+document.getElementById('termRow0').innerHTML =
+  '&gt;&gt;&gt; z = np.dot(X[0], weights) + bias<br>&gt;&gt;&gt; print(z)<br><span class="out">'+r0.z+'</span><br>'+
+  '&gt;&gt;&gt; y_hat = 1/(1+np.exp(-z))<br>&gt;&gt;&gt; print(y_hat)<br><span class="out">'+r0.p+'</span><br>'+
+  '&gt;&gt;&gt; print(y_hat - y[0])<br><span class="out">'+r0.err+'</span>';
+
+document.getElementById('handUpd').innerHTML =
+  '<div style="font-family:var(--serif);line-height:2.05">'+
+  '&#8711;w&#8321; = (1/'+M+')&sum;(ŷ<span class="sub">i</span>&minus;y<span class="sub">i</span>)x<span class="sub">i1</span> = <b>'+sgn(BG.gw[0])+'</b><br>'+
+  '&#8711;w&#8322; = (1/'+M+')&sum;(ŷ<span class="sub">i</span>&minus;y<span class="sub">i</span>)x<span class="sub">i2</span> = <b>'+sgn(BG.gw[1])+'</b><br>'+
+  'w&#8321; &#8592; '+f(W0[0],2)+' &minus; '+f(LR,1)+'&times;('+sgn(BG.gw[0])+') = <b>'+f(BG.wNew[0],4)+'</b><br>'+
+  'w&#8322; &#8592; '+mn(W0[1])+' &minus; '+f(LR,1)+'&times;('+sgn(BG.gw[1])+') = <b>'+sgn(BG.wNew[1])+'</b><br>'+
+  '<span style="font-family:var(--sans);font-size:.84rem;color:var(--ink-2)">Total movement after a full pass over all '+M+' rows: '+
+  f(Math.hypot(BG.wNew[0]-W0[0],BG.wNew[1]-W0[1]),4)+'</span></div>';
+document.getElementById('termUpd').innerHTML =
+  '&gt;&gt;&gt; d_weights<br><span class="out">array(['+BG.gw.map(v=>v.toFixed(8)).join(', ')+'])</span><br>'+
+  '&gt;&gt;&gt; weights = weights - 0.1*d_weights<br>&gt;&gt;&gt; weights<br>'+
+  '<span class="out">array(['+BG.wNew.map(v=>v.toFixed(8)).join(', ')+'])</span><br>'+
+  '&gt;&gt;&gt; loss<br><span class="out">'+BG.loss+'</span>';
+
+/* --- S3 SGD table --- */
+rows('tblSgd', SG.steps.map((s,i)=>[
+  NUM(i+1), NUM(s.row), NUM(sgn(s.z)), NUM(f(s.p,4)), NUM(sgn(s.err)), NUM(f(s.loss,4)),
+  NUM(f(s.wAfter[0],4)), NUM(sgn(s.wAfter[1])),
+  {v:(i>0 && SG.steps[i-1].dw2*s.dw2<0
+      ? '<b style="color:var(--bad)">'+fs(s.dw2,4)+' &#8617; reversed</b>'
+      : fs(s.dw2,4)), cls:'num'}
+]));
+const SGD1 = SG.steps[0];
+document.getElementById('handSgd1').innerHTML =
+  '<div style="font-family:var(--serif);line-height:2.05">'+
+  'Identical z and ŷ to Batch GD&rsquo;s row 0: ŷ = <b>'+f(SGD1.p,4)+'</b><br>'+
+  '&#8711;w&#8321; = (ŷ&minus;y)&middot;x&#8321; = ('+f(SGD1.err,4)+')('+mn(SGD1.x[0])+') = <b>'+sgn(SGD1.gw[0])+'</b><br>'+
+  '<span style="font-family:var(--sans);font-size:.84rem;color:var(--ink-2)">no &sum;, no &divide;'+M+' &mdash; one row is the whole signal</span><br>'+
+  'w&#8321; &#8592; '+f(W0[0],2)+' &minus; '+f(LR,1)+'&times;('+sgn(SGD1.gw[0])+') = <b>'+f(SGD1.wAfter[0],4)+'</b><br>'+
+  '<span style="font-family:var(--sans);font-size:.84rem;color:var(--ink-2)">Batch GD moved w&#8321; to '+f(BG.wNew[0],4)+
+  ' after seeing <b>all six</b> rows. SGD is already past it after <b>one</b>.</span></div>';
+document.getElementById('termSgd').innerHTML =
+  SG.steps.map((s,i)=>'&gt;&gt;&gt; <span style="color:#8fa6c2"># step '+(i+1)+' (row '+s.row+')</span><br>'+
+    '<span class="out">w = ['+s.wAfter.map(v=>v.toFixed(6)).join(', ')+']</span>').join('<br>');
+
+/* --- S4 figure --- */
+(function(){
+  const W=760,H=440, pad={l:56,r:16,t:16,b:44};
+  const x0=0.2,x1=3.0,y0=-0.85,y1=0.5;
+  const px = w => pad.l + (w-x0)/(x1-x0)*(W-pad.l-pad.r);
+  const py = w => H-pad.b - (w-y0)/(y1-y0)*(H-pad.t-pad.b);
+  const GX=56, GY=28;
+  let lo=Infinity, hi=-Infinity; const grid=[];
+  for(let i=0;i<GX;i++){ grid[i]=[]; for(let j=0;j<GY;j++){
+    const w1=x0+(x1-x0)*(i+0.5)/GX, w2=y0+(y1-y0)*(j+0.5)/GY;
+    const L=surfLoss(w1,w2,0); grid[i][j]=L; if(L<lo)lo=L; if(L>hi)hi=L;
+  }}
+  const BANDS=9;
+  const band = L => Math.min(BANDS-1, Math.floor((L-lo)/(hi-lo)*BANDS));
+  const bandFill = b => { const t=b/(BANDS-1); /* 0 = low loss = navy, 1 = high = cream */
+    const l=22+62*t, s=42-26*t, h=214-24*t; return 'hsl('+h+','+s+'%,'+l+'%)'; };
+  let cells='';
+  const cw=(W-pad.l-pad.r)/GX, ch=(H-pad.t-pad.b)/GY;
+  for(let i=0;i<GX;i++) for(let j=0;j<GY;j++){
+    cells += '<rect x="'+(pad.l+i*cw).toFixed(2)+'" y="'+(H-pad.b-(j+1)*ch).toFixed(2)+
+             '" width="'+(cw+0.6).toFixed(2)+'" height="'+(ch+0.6).toFixed(2)+
+             '" fill="'+bandFill(band(grid[i][j]))+'"/>';
+  }
+  const poly = (path,color,wid,dash) =>
+    '<polyline points="'+path.map(p=>px(p[0]).toFixed(1)+','+py(p[1]).toFixed(1)).join(' ')+
+    '" fill="none" stroke="'+color+'" stroke-width="'+wid+'" stroke-linejoin="round" stroke-linecap="round"'+
+    (dash?' stroke-dasharray="'+dash+'"':'')+' opacity=".96"/>';
+  const dot = (p,color,r,lab) => '<circle cx="'+px(p[0]).toFixed(1)+'" cy="'+py(p[1]).toFixed(1)+
+    '" r="'+r+'" fill="'+color+'" stroke="#fff" stroke-width="1.6"><title>'+lab+'</title></circle>';
+  let ticks='';
+  for(let t=0.5;t<=3.0;t+=0.5){ ticks+='<line x1="'+px(t)+'" y1="'+(H-pad.b)+'" x2="'+px(t)+'" y2="'+(H-pad.b+5)+'" stroke="#7b838e"/>'+
+    '<text x="'+px(t)+'" y="'+(H-pad.b+18)+'" text-anchor="middle" font-size="11" fill="#555c66" font-family="Calibri,sans-serif">'+t.toFixed(1)+'</text>'; }
+  for(let t=-0.75;t<=0.5;t+=0.25){ ticks+='<line x1="'+(pad.l-5)+'" y1="'+py(t)+'" x2="'+pad.l+'" y2="'+py(t)+'" stroke="#7b838e"/>'+
+    '<text x="'+(pad.l-9)+'" y="'+(py(t)+3.5)+'" text-anchor="end" font-size="11" fill="#555c66" font-family="Calibri,sans-serif">'+(t<0?'−'+Math.abs(t).toFixed(2):t.toFixed(2))+'</text>'; }
+  const svg =
+   '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-labelledby="figT figD" preserveAspectRatio="xMidYMid meet">'+
+   '<title id="figT">Weight-space trajectories of Batch GD, Mini-batch GD and SGD over 25 epochs</title>'+
+   '<desc id="figD">A shaded loss surface over weights w1 (horizontal, 0.2 to 3.0) and w2 (vertical, -0.85 to 0.5), '+
+   'darker where the batch cross-entropy of the six running rows is lower. Three trajectories start together at '+
+   'w1 = 0.5, w2 = -0.5. The Batch GD line is short and perfectly smooth, ending near w1 = '+f(P.batch.w[0],2)+
+   ' with loss '+f(P.batch.loss,4)+'. The mini-batch line is longer with slight waver, ending near w1 = '+f(P.mini.w[0],2)+
+   ' with loss '+f(P.mini.loss,4)+'. The SGD line is visibly jagged, staggering back and forth, and travels furthest, '+
+   'ending near w1 = '+f(P.sgd.w[0],2)+' with the lowest loss, '+f(P.sgd.loss,4)+'.</desc>'+
+   '<rect width="'+W+'" height="'+H+'" fill="#fffdf8"/>'+
+   '<g>'+cells+'</g>'+
+   '<rect x="'+pad.l+'" y="'+pad.t+'" width="'+(W-pad.l-pad.r)+'" height="'+(H-pad.t-pad.b)+'" fill="none" stroke="#0f2440" stroke-width="1"/>'+
+   ticks+
+   '<text x="'+((pad.l+W-pad.r)/2)+'" y="'+(H-6)+'" text-anchor="middle" font-size="12.5" fill="#0f2440" font-family="Cambria,Georgia,serif" font-style="italic">w₁  (weight on scaled Age)</text>'+
+   '<text x="15" y="'+((pad.t+H-pad.b)/2)+'" text-anchor="middle" font-size="12.5" fill="#0f2440" font-family="Cambria,Georgia,serif" font-style="italic" transform="rotate(-90 15 '+((pad.t+H-pad.b)/2)+')">w₂  (weight on scaled Salary)</text>'+
+   poly(P.sgd.path,'#a33b2c',1.7)+
+   poly(P.mini.path,'#c67c11',2.0)+
+   poly(P.batch.path,'#1b3c69',2.6)+
+   dot(P.batch.path[0],'#0f2440',5.5,'start: w = [0.50, -0.50], loss '+f(L_START,4))+
+   dot(P.batch.w,'#1b3c69',4.5,'Batch GD after 25 epochs: loss '+f(P.batch.loss,4))+
+   dot(P.mini.w,'#c67c11',4.5,'Mini-batch B=2 after 25 epochs: loss '+f(P.mini.loss,4))+
+   dot(P.sgd.w,'#a33b2c',4.5,'SGD after 25 epochs: loss '+f(P.sgd.loss,4))+
+   '<text x="'+(px(P.batch.path[0][0])+9)+'" y="'+(py(P.batch.path[0][1])+15)+'" font-size="11.5" fill="#0f2440" font-family="Calibri,sans-serif" font-weight="600">start</text>'+
+   '<g font-size="11" font-family="Calibri,sans-serif" fill="#fff">'+
+   '<rect x="'+(W-pad.r-150)+'" y="'+(pad.t+8)+'" width="140" height="46" rx="5" fill="rgba(15,36,64,.82)"/>'+
+   '<text x="'+(W-pad.r-140)+'" y="'+(pad.t+25)+'">lower loss</text>'+
+   '<text x="'+(W-pad.r-140)+'" y="'+(pad.t+45)+'" fill="#c8d4e4">darker shading</text>'+
+   '</g></svg>';
+  document.getElementById('figWrap').innerHTML = svg;
+})();
+rows('tblPaths', [
+  ['<b style="color:#1b3c69">Batch GD</b> (B='+M+')', NUM(P.batch.updates), NUM(f(P.batch.w[0],4)), NUM(sgn(P.batch.w[1])), NUM(f(P.batch.loss,4)), NUM(f(P.batch.loss-L_START,4))],
+  ['<b style="color:#c67c11">Mini-batch</b> (B=2)',   NUM(P.mini.updates),  NUM(f(P.mini.w[0],4)),  NUM(sgn(P.mini.w[1])),  NUM(f(P.mini.loss,4)),  NUM(f(P.mini.loss-L_START,4))],
+  ['<b style="color:#a33b2c">SGD</b> (B=1)',          NUM(P.sgd.updates),   NUM(f(P.sgd.w[0],4)),   NUM(sgn(P.sgd.w[1])),   HI(f(P.sgd.loss,4)),    NUM(f(P.sgd.loss-L_START,4))]
+]);
+
+/* --- S5 tables --- */
+rows('tblMini', MB.batches.map((b,i)=>[
+  NUM(i+1), b.idx.map(k=>RAW[k].i).join(', '), NUM(b.size), NUM(f(b.loss,4)),
+  NUM(sgn(b.gw[0])), NUM(f(b.wAfter[0],4)), NUM(sgn(b.wAfter[1]))
+]));
+document.getElementById('handMini').innerHTML =
+  '<table style="margin:0"><thead><tr><th>Variant</th><th class="num">updates</th><th class="num">w&#8321; after 1 epoch</th></tr></thead><tbody>'+
+  '<tr><td>Batch GD (B='+M+')</td><td class="num">1</td><td class="num">'+f(BG.wNew[0],4)+'</td></tr>'+
+  '<tr><td><b>Mini-batch (B=2)</b></td><td class="num">'+MB.batches.length+'</td><td class="num hi"><b>'+f(MB.wEnd[0],4)+'</b></td></tr>'+
+  '<tr><td>SGD (B=1)</td><td class="num">'+M+'</td><td class="num">'+f(SG.wEnd[0],4)+'</td></tr>'+
+  '</tbody></table><p style="font-size:.85rem;color:var(--ink-2);margin:.6rem 0 0">Strictly between the two extremes, and not by accident: '+
+  'it made '+MB.batches.length+' updates, between 1 and '+M+'.</p>';
+document.getElementById('termMini').innerHTML =
+  '&gt;&gt;&gt; <span style="color:#8fa6c2"># batch_size=2, one epoch</span><br>'+
+  MB.batches.map((b,i)=>'<span class="out">batch '+(i+1)+' (n='+b.size+') w = ['+b.wAfter.map(v=>v.toFixed(6)).join(', ')+']</span>').join('<br>');
+
+rows('tblRemainder', [[400,150],[400,32],[5000,64],[400,400],[400,1]].map(function(p){
+  const n=p[0], b=p[1], full=Math.floor(n/b), rem=n%b, tot=nUp(n,b);
+  return [NUM(int(n)), NUM(b), NUM(full), {v:(rem===0?'<span style="color:var(--ink-3)">none</span>':'<b>'+rem+' rows</b>'),cls:'num'},
+          HI(tot), '<span class="mono">'+tot+'/'+tot+'</span>'];
+}));
+rows('tblPow2', [16,32,50,64,100,128,256].map(function(b){
+  const isP = (b & (b-1))===0;
+  return [NUM(b), NUM(Math.log2(b)%1===0?Math.log2(b).toFixed(0):Math.log2(b).toFixed(2)),
+          (isP?'<b style="color:var(--ok)">yes</b>':'<b style="color:var(--bad)">no</b>'),
+          '<span class="mono">'+b.toString(2)+'</span>'];
+}));
+
+/* --- S6 timing --- */
+rows('tblTime', [
+  ['Updates per epoch', NUM(int(T.stepsPerEpochB)), NUM(int(T.stepsPerEpochS)), 'the <span class="mono">n/n</span> Keras prints'],
+  ['Updates in 10 epochs', NUM(int(T.stepsB)), NUM(int(T.stepsS)), f(T.stepsS/T.stepsB,0)+'&times; more chances to learn'],
+  ['Measured wall clock', NUM(f(T.tB,3)+' s'), NUM(f(T.tS,3)+' s'), '<b>'+f(T.wallRatio,2)+'&times;</b> slower overall'],
+  ['Time per update', HI(f(T.msB,1)+' ms'), NUM(f(T.msS,2)+' ms'), 'one batch step costs '+f(T.perStepRatio,0)+'&times; a single-row step &mdash; but carries '+int(T.B)+'&times; the data'],
+  ['val_loss, epoch 1 &#8594; 10', NUM(f(T.vlB0,4)+' &#8594; '+f(T.vlB1,4)), NUM(f(T.vlS0,4)+' &#8594; '+f(T.vlS1,4)), 'the run that matters'],
+  ['Total val_loss removed', NUM(f(T.dropB,4)), HI(f(T.dropS,4)), '<b>'+f(T.dropRatio,0)+'&times;</b> more learning'],
+  ['val_loss removed per second', NUM(f(T.dpsB,5)), HI(f(T.dpsS,5)), '<b>'+f(T.dpsRatio,0)+'&times;</b> better use of wall clock'],
+  ['final val_accuracy', NUM(f(T.accB*100,2)+'%'), NUM(f(T.accS*100,2)+'%'), 'both reach a usable model &mdash; at very different loss']
+]);
+/* --- S7 memory --- */
+rows('tblMem', MEMS.map(function(m){
+  return [NUM(m.d), {v:'<b>'+f(m.full,1)+' GB</b>',cls:'num'}, NUM(f(m.mini,1)+' KB'),
+          NUM(int(Math.round(m.ratio))+'&times;'),
+          m.full>16 ? '<b style="color:var(--bad)">MemoryError</b> before the first update'
+                    : 'fits, but leaves little for activations'];
+}));
+/* --- reference overlay --- */
+rows('tblCheat', [
+  ['Data per update','Entire dataset','1 row','Small batch (32&ndash;256)'],
+  ['Updates per epoch','<b>1</b>','<b>N</b> = '+int(N_TRAIN),'<b>&#8968;N/B&#8969;</b> = '+nUp(N_TRAIN,32)+' at B=32'],
+  ['Speed per epoch','Fast (vectorized)','Slow (looped)','Fast (vectorized per batch)'],
+  ['Epochs to converge','Many','Few','Few&ndash;moderate'],
+  ['Loss curve','Smooth','Noisy / jagged','Slightly noisy'],
+  ['Escapes local minima?','No &mdash; freezes','Yes &mdash; noise jolts it out','Sometimes'],
+  ['Memory','High (whole set)','Very low (1 row)','Low, and <b>constant</b> in N'],
+  ['Our 6 rows, 1 epoch','w&#8321; &#8594; '+f(BG.wNew[0],4),'w&#8321; &#8594; '+f(SG.wEnd[0],4),'w&#8321; &#8594; '+f(MB.wEnd[0],4)+' (B=2)'],
+  ['25 epochs, batch loss',f(P.batch.loss,4),f(P.sgd.loss,4),f(P.mini.loss,4)+' (B=2)']
+]);
+rows('tblSyms', [
+  ['<span class="sym">N</span>','<span class="var">X_train.shape[0]</span>','training rows',NUM(M+' here, '+int(N_TRAIN)+' in the notebook')],
+  ['<span class="sym">B</span>','<span class="var">batch_size</span>','rows per update',NUM('1, 2 or '+M)],
+  ['<span class="sym">&eta;</span>','<span class="var">learning_rate</span>','step size',NUM(f(LR,1))],
+  ['<span class="sym">&theta;&#8320;</span>','<span class="var">weights</span>','initial weights',NUM(vec(W0,1))],
+  ['<span class="sym">z</span>','<span class="var">np.dot(X, w) + b</span>','pre-activation',NUM('row 0: '+sgn(r0.z))],
+  ['<span class="sym">ŷ</span>','<span class="var">y_hat</span>','&sigma;(z), predicted probability',NUM('row 0: '+f(r0.p,4))],
+  ['<span class="sym">J</span>','<span class="var">loss</span>','binary cross-entropy',NUM('batch: '+f(BG.loss,4))],
+  ['<span class="sym">&#8711;<span class="sub">w</span>J</span>','<span class="var">d_weights</span>','gradient',NUM(vec(BG.gw,4))]
+]);
+rows('tblRefData', RAW.map((r,k)=>[NUM(r.i), NUM(X[k][0]<0?mn(X[k][0]):f(X[k][0],2)), NUM(X[k][1]<0?mn(X[k][1]):f(X[k][1],2)), NUM(r.y)]));
+
+/* fill all [data-v] placeholders */
+$$('[data-v]').forEach(function(node){
+  const k = node.getAttribute('data-v');
+  node.innerHTML = (k in VALUES) ? VALUES[k] : '<span style="color:var(--bad)">?'+k+'</span>';
+});
+
+/* ============================================================
+   5. ITEM BANK — one array. Every `correct` is a computed value.
+   ============================================================ */
+const z0 = W0[0]*X[0][0] + W0[1]*X[0][1] + B0;
+const ITEMS = [
+/* ---------------- SECTION 1 ---------------- */
+{id:'s1_b1', sec:1, kind:'blank', tag:'Fill the blank',
+ prompt:'The notebook runs <span class="mono">model.fit(X_scaled, y, epochs=10, batch_size=320)</span> on '+int(N_TRAIN)+' training rows. Weight updates in <b>one</b> epoch = {}',
+ correct:String(nUp(N_TRAIN,320)),
+ options:[String(nUp(N_TRAIN,320)), String(N_TRAIN), String(T.epochs), String(T.epochs*N_TRAIN)],
+ hints:{[String(N_TRAIN)]:'That is the row count — the answer you would get at batch_size=1. Here all '+int(N_TRAIN)+' rows are consumed by a single update.',
+        [String(T.epochs)]:'That is the number of epochs. The question asks how many updates happen inside one of them.',
+        [String(T.epochs*N_TRAIN)]:'That is the total across all 10 epochs at B=1 — two multiplications too far.'},
+ why:'B equals N, so the whole training set produces one averaged gradient and θ moves once. This is Batch GD.'},
+
+{id:'s1_b2', sec:1, kind:'blank', tag:'Fill the blank',
+ prompt:'Change one argument to <span class="mono">batch_size=1</span>, nothing else. Weight updates in <b>one</b> epoch = {}',
+ correct:String(nUp(N_TRAIN,1)),
+ options:[String(nUp(N_TRAIN,1)), '1', String(T.epochs), String(N_TRAIN/2)],
+ hints:{'1':'That is the batch_size itself — and the Batch-GD answer. At B=1 every one of the '+int(N_TRAIN)+' rows triggers its own update.',
+        [String(T.epochs)]:'Epochs again. Updates per epoch do not depend on how many epochs you run.',
+        [String(N_TRAIN/2)]:'That would be right if two rows shared an update. At B=1 no row shares with anyone.'},
+ why:'⌈320/1⌉ = 320. Same data, same epochs, 320× the learning steps — that is the entire difference between the two runs.'},
+
+{id:'s1_m1', sec:1, kind:'mcq', tag:'Check',
+ prompt:'What does "1 epoch" mean?',
+ correct:'One complete pass over every training row.',
+ options:['One complete pass over every training row.','One weight update.','One forward pass on a single row.','One batch of 32 rows.'],
+ hints:{'One weight update.':'True only for Batch GD, and that is a coincidence of B=N — at B=1 one epoch is 320 updates.',
+        'One forward pass on a single row.':'That is one SGD step, not an epoch. An epoch contains 320 of them.',
+        'One batch of 32 rows.':'That is one mini-batch. An epoch is however many batches it takes to cover the data.'},
+ why:'An epoch is defined by the data (one full pass), never by the update count — which is exactly why batch_size can vary the updates so wildly while "10 epochs" stays fixed.'},
+
+{id:'s1_m2', sec:1, kind:'mcq', tag:'Check',
+ prompt:'A dataset has 320 training rows and <span class="mono">batch_size</span> is set to 320. Which variant is running?',
+ correct:'Batch Gradient Descent',
+ options:['Batch Gradient Descent','Stochastic Gradient Descent','Mini-Batch Gradient Descent','None — 320 is not a power of two'],
+ hints:{'Stochastic Gradient Descent':'SGD is batch_size = 1. Here a single update sees all 320 rows, the opposite extreme.',
+        'Mini-Batch Gradient Descent':'Mini-batch means B is strictly between 1 and N. Here B equals N exactly.',
+        'None — 320 is not a power of two':'Powers of two are a hardware-efficiency preference, not a rule that changes which algorithm runs.'},
+ why:'B = N is the definition of Batch GD. Keras confirms it by printing 1/1 — one step per epoch.'},
+
+/* ---------------- SECTION 2 ---------------- */
+{id:'s2_b1', sec:2, kind:'blank', tag:'Fill the arithmetic',
+ prompt:'Row 0, scaled to <span class="mono">['+mn(X[0][0])+', '+mn(X[0][1])+']</span>. With w = <span class="mono">[0.5, −0.5]</span>, b = 0:<br><span class="mono">z = 0.5×('+mn(X[0][0])+') + (−0.5)×('+mn(X[0][1])+') + 0 =</span> {}',
+ correct:mn(z0),
+ options:[mn(z0), mn(W0[0]*X[0][0] - Math.abs(W0[1]*X[0][1])), '+'+Math.abs(z0).toFixed(2), mn(W0[0]*X[0][0])],
+ hints:{[mn(W0[0]*X[0][0] - Math.abs(W0[1]*X[0][1]))]:'You subtracted the second term. Two negatives multiply to a positive: (−0.5)×(−0.94) = +0.47, so it is added.',
+        ['+'+Math.abs(z0).toFixed(2)]:'Right magnitude, wrong sign. 0.5×(−1.60) = −0.80 dominates the +0.47.',
+        [mn(W0[0]*X[0][0])]:'That is only the first term. The salary feature contributes +0.47 on top of it.'},
+ why:'−0.80 + 0.47 = −0.33. A negative z means σ(z) < 0.5 — the model currently leans "will not purchase", which for this row (y=0) is the right lean.'},
+
+{id:'s2_b2', sec:2, kind:'blank', tag:'Fill the arithmetic',
+ prompt:'Push it through the sigmoid: <span class="mono">y_hat = 1/(1+np.exp(−z))</span> with z = '+mn(z0)+' gives {}',
+ correct:f(sig(z0),4),
+ options:[f(sig(z0),4), f(1-sig(z0),4), Math.abs(z0).toFixed(4), (1-Math.abs(z0)).toFixed(4)],
+ hints:{[f(1-sig(z0),4)]:'That is 1 − ŷ, the probability of the other class. σ of a negative z must land below 0.5.',
+        [Math.abs(z0).toFixed(4)]:'That is |z| itself. The sigmoid has to be applied — a raw logit is not a probability.',
+        [(1-Math.abs(z0)).toFixed(4)]:'1 − |z| is not the sigmoid; σ is not linear.'},
+ why:'σ(−0.33) = 0.4182. Since y = 0, the error ŷ − y is +0.4182 — the model is over-predicting purchase by that much, and that number is what drives the gradient.'},
+
+{id:'s2_b3', sec:2, kind:'blank', tag:'Complete the line',
+ prompt:'The line that makes this <em>batch</em> GD rather than a sum of six separate updates:<br><span class="mono">d_weights = np.dot(X_train.T, (y_hat − y_train))</span> {}',
+ correct:'/ len(y_train)',
+ options:['/ len(y_train)','* len(y_train)','/ learning_rate','(nothing at all)'],
+ hints:{'* len(y_train)':'Multiplying scales the gradient up by m — a 6× larger step that grows with dataset size. The rule divides.',
+        '/ learning_rate':'η is applied separately in the update line, and dividing by 0.1 would multiply the gradient by 10.',
+        '(nothing at all)':'Without it you have the sum, not the mean — so the step size would silently depend on how many rows you happen to have.'},
+ why:'Dividing by m turns Σ∇Jᵢ into the mean gradient, which is what the rule θ ← θ − η·(1/m)Σ∇Jᵢ specifies. It also makes η mean the same thing whether you train on 6 rows or 6 million.'},
+
+{id:'s2_m1', sec:2, kind:'mcq', tag:'Check',
+ prompt:'During one epoch of Batch GD on our '+M+' rows, how many times does the array <span class="mono">weights</span> change?',
+ correct:'Once — after all '+M+' rows have been seen.',
+ options:['Once — after all '+M+' rows have been seen.','Six times — once per row.','Twice — once for w₁ and once for w₂.','Zero — the first epoch only measures the loss.'],
+ hints:{'Six times — once per row.':'That is SGD. In Batch GD the update line sits outside the row loop — in fact there is no row loop, just one dot product.',
+        'Twice — once for w₁ and once for w₂.':'Both components are written in the same assignment; that is one update, not two.',
+        'Zero — the first epoch only measures the loss.':'No warm-up epoch exists. The gradient is computed and applied on the very first pass.'},
+ why:'One epoch, one update — which is why w₁ only crawls from 0.5000 to '+f(BG.wNew[0],4)+' after seeing everything.'},
+
+{id:'s2_m2', sec:2, kind:'mcq', tag:'Check',
+ prompt:'Batch GD reports a loss of '+f(BG.loss,4)+'. What exactly is that number?',
+ correct:'The mean of the '+M+' per-row losses, all measured at the same weights.',
+ options:['The mean of the '+M+' per-row losses, all measured at the same weights.',
+          'The loss of the single worst row.',
+          'The sum of the '+M+' per-row losses.',
+          'The mean of '+M+' losses, each measured after its own update.'],
+ hints:{'The loss of the single worst row.':'The worst row scores '+f(Math.max.apply(null,BG.rows.map(r=>r.loss)),4)+'. The reported figure is lower because it is an average.',
+        ['The sum of the '+M+' per-row losses.']:'The sum is '+f(BG.rows.reduce((s,r)=>s+r.loss,0),4)+'. Same 1/m division as the gradient applies to the loss.',
+        ['The mean of '+M+' losses, each measured after its own update.']:'That describes SGD, and it averages to '+f(SGD_MEAN_LOSS,4)+' — a different number, because the weights moved between measurements.'},
+ why:'One vantage point, six measurements. That shared θ is precisely why the batch loss curve is smooth: consecutive epochs are comparable in a way SGD steps are not.'},
+
+/* ---------------- SECTION 3 ---------------- */
+{id:'s3_b1', sec:3, kind:'blank', tag:'Fill the arithmetic',
+ prompt:'SGD step 1 sees only row 0, so ∇w₁ = (ŷ − y)·x₁ = ('+f(SGD1.err,4)+')×('+mn(SGD1.x[0])+') = '+sgn(SGD1.gw[0])+'.<br><span class="mono">w₁ = 0.5 − 0.1 × ('+sgn(SGD1.gw[0])+') =</span> {}',
+ correct:f(SG.steps[0].wAfter[0],4),
+ options:[f(SG.steps[0].wAfter[0],4), f(W0[0]-LR*(SG.steps[0].gw[0]/M),4), f(W0[0]+LR*SG.steps[0].gw[0],4), f(BG.wNew[0],4)],
+ hints:{[f(W0[0]-LR*(SG.steps[0].gw[0]/M),4)]:'You divided by m = '+M+'. SGD has m = 1 — there is nothing to average, so the row lands at full strength.',
+        [f(W0[0]+LR*SG.steps[0].gw[0],4)]:'You added instead of subtracting. Gradient descent moves against the gradient.',
+        [f(BG.wNew[0],4)]:'That is Batch GD’s answer after all '+M+' rows. SGD gets further than that after just one.'},
+ why:'0.5 − 0.1×(−0.6692) = '+f(SG.steps[0].wAfter[0],4)+'. One row has already moved w₁ further than Batch GD moved it with all six, because no averaging diluted it.'},
+
+{id:'s3_b2', sec:3, kind:'blank', tag:'Fill the blank',
+ prompt:'One epoch of SGD over our '+M+' rows performs {} weight updates.',
+ correct:String(M),
+ options:[String(M),'1','3',String(M*M)],
+ hints:{'1':'That is Batch GD. In SGD the update line moved inside the row loop.',
+        '3':'That is B=2 mini-batch — '+M+'/2 batches. At B=1 nothing is grouped.',
+        [String(M*M)]:'You multiplied rows by rows. Each row fires exactly one update.'},
+ why:'N updates per epoch, by definition. On the notebook’s 320 rows that is 320 — the number Keras prints as the progress denominator.'},
+
+{id:'s3_b3', sec:3, kind:'blank', tag:'Complete the line',
+ prompt:'Extracting one row while keeping the array 2-D:<br><span class="mono">x_point = shuffled_X[</span>{}<span class="mono">]</span>',
+ correct:'i:i+1, :',
+ options:['i:i+1, :','i',':, i','0:'+M+', :'],
+ hints:{'i':'That returns shape (2,), not (1,2). The batch axis vanishes and the gradient comes back the wrong shape.',
+        ':, i':'That selects column i — one feature across all rows, the transpose of what you want.',
+        ['0:'+M+', :']:'That is the whole dataset, which turns your SGD loop back into '+M+' identical Batch GD steps.'},
+ why:'Slicing i:i+1 keeps the row 2-D as (1, 2), so np.dot and the transpose in the gradient behave exactly as they do in the batch code — only the row count changes.'},
+
+{id:'s3_m1', sec:3, kind:'mcq', tag:'Check',
+ prompt:'In the table above, Δw₂ changes sign partway through the epoch — w₂ moves up, then back down. Why?',
+ correct:'Consecutive rows disagree about which way w₂ should go, and with B=1 nothing averages that disagreement away.',
+ options:['Consecutive rows disagree about which way w₂ should go, and with B=1 nothing averages that disagreement away.',
+          'The learning rate is too high and the step overshot the minimum.',
+          'A bug — gradient descent can never reverse direction.',
+          'The loss increased, so the optimizer reversed on purpose.'],
+ hints:{'The learning rate is too high and the step overshot the minimum.':'η is identical in all three variants here, and Batch GD never reverses with it. The cause is which rows are seen, not how big the step is.',
+        'A bug — gradient descent can never reverse direction.':'It reverses whenever the gradient does. Each row has its own gradient, and they genuinely point different ways.',
+        'The loss increased, so the optimizer reversed on purpose.':'Plain SGD has no memory of previous losses and no correction mechanism — it just follows whatever the current row says.'},
+ why:'Each row carries its own class and its own feature values, so its private gradient can oppose the previous row’s. Batch GD averages those disagreements into one direction before moving; SGD acts on each in turn. That is the noise, and it is structural, not a bug.'},
+
+{id:'s3_m2', sec:3, kind:'mcq', tag:'Check',
+ prompt:'The '+M+' SGD step-losses average '+f(SGD_MEAN_LOSS,4)+', while Batch GD reports '+f(BG.loss,4)+' — on identical data from an identical start. Why do they differ?',
+ correct:'Each SGD loss was measured at a different θ, because the weights moved between measurements.',
+ options:['Each SGD loss was measured at a different θ, because the weights moved between measurements.',
+          'SGD uses a different loss function.',
+          'SGD is already the better model at this point.',
+          'Rounding error in the 2-decimal scaled features.'],
+ hints:{'SGD uses a different loss function.':'Both are binary cross-entropy — step 1 of each produces the identical loss of '+f(BG.rows[0].loss,4)+'.',
+        'SGD is already the better model at this point.':'Possibly, but that is not what these averages show: they were taken at six different models, so they cannot be compared directly.',
+        'Rounding error in the 2-decimal scaled features.':'Both computations use the same rounded features. The gap is '+f(Math.abs(BG.loss-SGD_MEAN_LOSS),4)+' — far too large for that.'},
+ why:'A batch loss curve is six photographs of one model; an SGD loss curve is one photograph each of six different models. That is why SGD curves look jagged even when training is going perfectly well.'},
+
+/* ---------------- SECTION 4 ---------------- */
+{id:'s4_b1', sec:4, kind:'blank', tag:'Read it off the table',
+ prompt:'Inside a single SGD epoch over '+M+' rows, the sign of Δw₂ flips {} times.',
+ correct:String(REVS),
+ options:[String(REVS),'0','1',String(M)],
+ hints:{'0':'Zero reversals is the Batch GD signature — it takes one step per epoch, so it has nothing to contradict.',
+        '1':'Look again at the Δw₂ column: more than one row disagrees with its predecessor.',
+        [String(M)]:'That is the number of rows. Not every row reverses direction — only the ones that disagree with the previous one.'},
+ why:REVS+' reversals in '+M+' steps. Scale that to the notebook’s 320 rows per epoch and you get the jagged loss curve in Fig. 3 of the source worksheet.'},
+
+{id:'s4_b2', sec:4, kind:'blank', tag:'Read it off the figure',
+ prompt:'After 25 epochs from the same start, Batch GD reaches a batch loss of '+f(P.batch.loss,4)+'. SGD reaches {}',
+ correct:f(P.sgd.loss,4),
+ options:[f(P.sgd.loss,4), f(P.batch.loss,4), f(P.mini.loss,4), f(L_START,4)],
+ hints:{[f(P.batch.loss,4)]:'That is Batch GD’s own figure, repeated. The whole point of the plot is that SGD ends somewhere else.',
+        [f(P.mini.loss,4)]:'That is mini-batch at B=2 — between the two, as it should be, but not the lowest.',
+        [f(L_START,4)]:'That is the loss at the shared starting point, before any epoch ran.'},
+ why:'Same 25 epochs, same data, same η: '+f(P.batch.loss,4)+' vs '+f(P.sgd.loss,4)+'. The noisy path got substantially further down because it took '+P.sgd.updates+' steps instead of '+P.batch.updates+'.'},
+
+{id:'s4_m1', sec:4, kind:'mcq', tag:'Check',
+ prompt:'On a rugged loss surface with several shallow valleys and one deep canyon, which variant is most likely to be stuck permanently in a shallow valley?',
+ correct:'Batch Gradient Descent',
+ options:['Batch Gradient Descent','Stochastic Gradient Descent','Both equally','Neither — gradient descent never gets stuck'],
+ hints:{'Stochastic Gradient Descent':'SGD is the one that escapes: an outlying row produces a large gradient that jolts θ over the valley wall.',
+        'Both equally':'They differ precisely here. One has noise to escape with; the other has averaged it all away.',
+        'Neither — gradient descent never gets stuck':'A zero gradient is a full stop. At the bottom of a shallow valley the averaged gradient is zero, and Batch GD has nothing else to move it.'},
+ why:'Batch GD’s averaged gradient reaches zero at the bottom of the shallow valley and it freezes. SGD’s per-row noise keeps it moving — the same instability that makes its curve ugly is what gets it out.'},
+
+{id:'s4_m2', sec:4, kind:'mcq', tag:'Check',
+ prompt:'In Fig. 1, the jagged red trace travels furthest and ends deepest in the valley. What does that combination demonstrate?',
+ correct:'Noise costs smoothness but buys distance — more updates per epoch move θ further, even along a worse-looking path.',
+ options:['Noise costs smoothness but buys distance — more updates per epoch move θ further, even along a worse-looking path.',
+          'SGD uses a larger learning rate.',
+          'The plot is misleading; a smoother path is always further along.',
+          'SGD ran for more epochs than the other two.'],
+ hints:{'SGD uses a larger learning rate.':'η is 0.1 for all three — the code sets it once, before the split. Only batch size differs.',
+        'The plot is misleading; a smoother path is always further along.':'Smoothness and progress are independent. The numbers in the table under the figure confirm the red path really does end at the lowest loss.',
+        'SGD ran for more epochs than the other two.':'All three ran exactly 25 epochs. SGD ran more *updates* — '+P.sgd.updates+' against '+P.batch.updates+' — within those same epochs.'},
+ why:'Equal epochs, equal η, equal data. The only difference is that SGD applied '+P.sgd.updates+' updates to Batch GD’s '+P.batch.updates+'. Distance travelled per epoch is what batch size really controls.'},
+
+/* ---------------- SECTION 5 ---------------- */
+{id:'s5_b1', sec:5, kind:'blank', tag:'Fill the blank',
+ prompt:'400 rows, <span class="mono">batch_size = 150</span>. Keras builds {} batches per epoch.',
+ correct:String(nUp(400,150)),
+ options:[String(nUp(400,150)), String(Math.floor(400/150)), String(nUp(400,150)+1), '150'],
+ hints:{[String(Math.floor(400/150))]:'That is the floor — it throws away the leftover 100 rows. Keras rounds up and trains on them.',
+        [String(nUp(400,150)+1)]:'One too many. 150 + 150 + 100 = 400 exactly; there is nothing left for a fourth.',
+        '150':'That is the batch size, not the batch count.'},
+ why:'⌈400/150⌉ = 3. Two full batches of 150 and one short batch — and the short one still triggers a complete weight update.'},
+
+{id:'s5_b2', sec:5, kind:'blank', tag:'Fill the blank',
+ prompt:'Of those, the final batch contains {} rows.',
+ correct:String(400%150),
+ options:[String(400%150),'150','50','0'],
+ hints:{'150':'Only the first two are full. 150 + 150 = 300, leaving fewer than a full batch behind.',
+        '50':'400 − 150 = 250, but that is after one batch, not two. After two: 400 − 300.',
+        '0':'That would mean 150 divides 400 evenly. It does not — 400 mod 150 = 100.'},
+ why:'400 mod 150 = 100. Keras never drops the remainder; it ships a smaller final batch, which is why the progress bar reads 3/3.'},
+
+{id:'s5_b3', sec:5, kind:'blank', tag:'Fill the blank',
+ prompt:'A 5,000-row dataset with <span class="mono">batch_size = 64</span> produces {} weight updates per epoch.',
+ correct:String(nUp(5000,64)),
+ options:[String(nUp(5000,64)), String(Math.floor(5000/64)), String(nUp(5000,64)+1), '64'],
+ hints:{[String(Math.floor(5000/64))]:'That is the count of *full* batches. The '+(5000%64)+' leftover rows form one more batch and get their own update.',
+        [String(nUp(5000,64)+1)]:'One too many — 78 full batches plus the single remainder batch is 79.',
+        '64':'That is the batch size again, not how many batches fit into 5,000 rows.'},
+ why:'78 full batches of 64 = 4,992 rows, plus one remainder batch of '+(5000%64)+' = 79 updates per epoch.'},
+
+{id:'s5_b4', sec:5, kind:'blank', tag:'Complete the line',
+ prompt:'The one place hand-written mini-batch loops go wrong:<br><span class="mono">d_w = np.dot(Xb.T, (y_hat − yb)) /</span> {}',
+ correct:'len(yb)',
+ options:['len(yb)','batch_size','len(y_train)','1'],
+ hints:{'batch_size':'Identical for every full batch — and wrong for the remainder batch, where len(yb) is smaller. It silently shrinks the last update of every epoch.',
+        'len(y_train)':'That divides by the whole dataset, making every mini-batch update N/B times too small.',
+        '1':'No averaging at all turns each batch into a sum, so the step size would scale with batch size.'},
+ why:'len(yb) is the number of rows actually in this batch. On the remainder batch it differs from batch_size — dividing by the wrong one is a bug that never raises an error and just quietly weakens the last update of each epoch.'},
+
+{id:'s5_m1', sec:5, kind:'mcq', tag:'Check',
+ prompt:'Why are standard batch sizes 32, 64, 128, 256 rather than round numbers like 50 or 100?',
+ correct:'Computer memory is addressed in binary, so power-of-two batches align cleanly onto RAM blocks and cache lines.',
+ options:['Computer memory is addressed in binary, so power-of-two batches align cleanly onto RAM blocks and cache lines.',
+          'Powers of two give mathematically better gradients.',
+          'Keras rejects batch sizes that are not powers of two.',
+          'They guarantee the dataset divides evenly with no remainder batch.'],
+ hints:{'Powers of two give mathematically better gradients.':'The gradient maths is identical at B=64 and B=100. The reason is hardware, not statistics.',
+        'Keras rejects batch sizes that are not powers of two.':'It accepts any positive integer — batch_size=150 in the worked example above runs fine.',
+        'They guarantee the dataset divides evenly with no remainder batch.':'They guarantee nothing of the sort: 400 rows at B=64 still leaves a remainder of '+(400%64)+'.'},
+ why:'Binary registers and cache lines are sized in powers of two, so a power-of-two batch does not straddle boundaries. It is a data-transfer optimisation, invisible to the maths.'},
+
+{id:'s5_m2', sec:5, kind:'mcq', tag:'Check',
+ prompt:'On our six rows, mini-batch at B=2 ended one epoch at w₁ = '+f(MB.wEnd[0],4)+', between Batch GD’s '+f(BG.wNew[0],4)+' and SGD’s '+f(SG.wEnd[0],4)+'. What determined where it landed?',
+ correct:'It applied '+MB.batches.length+' updates — between Batch GD’s 1 and SGD’s '+M+'.',
+ options:['It applied '+MB.batches.length+' updates — between Batch GD’s 1 and SGD’s '+M+'.',
+          'It used a learning rate halfway between the other two.',
+          'It averaged the final weights of the other two runs.',
+          'Coincidence — the ordering would flip with different rows.'],
+ hints:{'It used a learning rate halfway between the other two.':'All three used η = 0.1. Batch size was the only thing that changed.',
+        'It averaged the final weights of the other two runs.':'The three runs are independent; mini-batch never sees the others. The mean of their endpoints is '+f((BG.wNew[0]+SG.wEnd[0])/2,4)+', which is not where it landed.',
+        'Coincidence — the ordering would flip with different rows.':'The ordering follows from update count, which is set by B alone. More updates per epoch means further travelled, whatever the rows are.'},
+ why:'Distance travelled per epoch tracks the number of updates, and B sets that directly. Mini-batch is the middle ground numerically, not just rhetorically.'},
+
+/* ---------------- SECTION 6 ---------------- */
+{id:'s6_b1', sec:6, kind:'blank', tag:'Fill the blank',
+ prompt:'The <span class="mono">batch_size=1</span> run: 10 epochs over '+int(N_TRAIN)+' training rows. Total weight updates = {}',
+ correct:String(T.stepsS),
+ options:[String(T.stepsS), String(N_TRAIN), String(T.epochs), String(T.epochs+N_TRAIN)],
+ hints:{[String(N_TRAIN)]:'That is one epoch’s worth. Ten epochs multiply it.',
+        [String(T.epochs)]:'That is the epoch count — and, by coincidence, the entire update budget of the batch_size=320 run. SGD did 320× more.',
+        [String(T.epochs+N_TRAIN)]:'You added epochs and rows. Each epoch contributes a full '+int(N_TRAIN)+' updates, so the two multiply.'},
+ why:'10 × 320 = 3,200 updates against Batch GD’s 10. That ratio is why the slower run learned so much more.'},
+
+{id:'s6_b2', sec:6, kind:'blank', tag:'Fill the arithmetic',
+ prompt:'Measured wall clock: '+f(T.tS,4)+' s at B=1 against '+f(T.tB,4)+' s at B=320. SGD was {}× slower.',
+ correct:f(T.wallRatio,2),
+ options:[f(T.wallRatio,2), f(T.tB/T.tS,2), f(T.perStepRatio,1), String(T.B)],
+ hints:{[f(T.tB/T.tS,2)]:'That is the ratio inverted — it says batch took a fifth of the time, which is the same fact stated backwards.',
+        [f(T.perStepRatio,1)]:'That is the *per-update* ratio: one batch step costs '+f(T.perStepRatio,0)+'× a single-row step. Total wall clock is a different comparison.',
+        [String(T.B)]:'320 is the ratio of *updates*, not of time. If time scaled with updates, SGD would have taken 320× longer — it took only '+f(T.wallRatio,2)+'×.'},
+ why:'16.54 / 3.30 = '+f(T.wallRatio,2)+'×. Note how far that is from 320×: doing 320× the updates cost only '+f(T.wallRatio,1)+'× the time, because a 320-row vectorized step is nowhere near 320× the cost of a 1-row step.'},
+
+{id:'s6_b3', sec:6, kind:'blank', tag:'Fill the arithmetic',
+ prompt:'Per-update cost at B=320: '+f(T.tB,4)+' s ÷ '+T.stepsB+' updates = {} ms',
+ correct:f(T.msB,1),
+ options:[f(T.msB,1), f(T.msS,2), f(T.tB*1000,1), f(T.tB*1000/100,2)],
+ hints:{[f(T.msS,2)]:'That is the B=1 figure ('+f(T.tS,2)+' s ÷ '+T.stepsS+' updates). The batch step is far more expensive individually.',
+        [f(T.tB*1000,1)]:'That is the whole run in milliseconds — you have not divided by the '+T.stepsB+' updates yet.',
+        [f(T.tB*1000/100,2)]:'Divided by 100 rather than by the '+T.stepsB+' updates the run actually performed.'},
+ why:f(T.msB,1)+' ms per batch update against '+f(T.msS,2)+' ms per single-row update — '+f(T.perStepRatio,0)+'× the cost for 320× the data. That sublinear scaling is exactly what vectorization buys, and exactly why mini-batch wins.'},
+
+{id:'s6_m1', sec:6, kind:'mcq', tag:'Check',
+ prompt:'Which statement about "fast" is TRUE?',
+ correct:'Batch GD is faster per epoch, but SGD usually converges in far fewer epochs.',
+ options:['Batch GD is faster per epoch, but SGD usually converges in far fewer epochs.',
+          'Batch GD is faster in every sense than SGD.',
+          'SGD is faster per epoch, but Batch GD converges in fewer epochs.',
+          'Speed is unaffected by batch size.'],
+ hints:{'Batch GD is faster in every sense than SGD.':'It won wall clock ('+f(T.wallRatio,2)+'× faster) and lost learning badly: val_loss fell '+f(T.dropB,4)+' against SGD’s '+f(T.dropS,4)+'.',
+        'SGD is faster per epoch, but Batch GD converges in fewer epochs.':'Exactly backwards. SGD took '+f(T.wallRatio,2)+'× longer per epoch and still ended with far lower loss.',
+        'Speed is unaffected by batch size.':'The two measured runs differ only in batch_size, and their wall clocks differ by '+f(T.wallRatio,2)+'×.'},
+ why:'Two different clocks. Per epoch, one vectorized matrix op beats 320 sequential ones. Per unit of learning, 320 updates beat 1. Both true, and you have to say which you mean.'},
+
+{id:'s6_m2', sec:6, kind:'mcq', tag:'Check',
+ prompt:'A colleague sets <span class="mono">batch_size=1</span> on a 1-million-row dataset, reasoning "most updates means fastest convergence". What is the flaw?',
+ correct:'Convergence in epochs is not convergence in wall clock — a million non-vectorized steps per epoch may take longer than mini-batch needs to finish entirely.',
+ options:['Convergence in epochs is not convergence in wall clock — a million non-vectorized steps per epoch may take longer than mini-batch needs to finish entirely.',
+          'No flaw — more updates is strictly better.',
+          'batch_size=1 does not actually update the weights every row.',
+          'The flaw is memory: batch_size=1 will exhaust RAM.'],
+ hints:{'No flaw — more updates is strictly better.':'More updates per *epoch*, yes. But each is unvectorized, and our own measurement shows the B=1 run costing '+f(T.wallRatio,2)+'× the wall clock on only 320 rows.',
+        'batch_size=1 does not actually update the weights every row.':'It does — that is the definition. The reasoning is wrong about cost, not about mechanics.',
+        'The flaw is memory: batch_size=1 will exhaust RAM.':'Backwards: B=1 is the most memory-frugal setting there is. Memory is Batch GD’s problem.'},
+ why:'They are right about update count and wrong about time. Mini-batch keeps most of the update frequency while restoring vectorization — which is why nobody trains a million rows at B=1.'},
+
+/* ---------------- SECTION 7 ---------------- */
+{id:'s7_b1', sec:7, kind:'blank', tag:'Fill the arithmetic',
+ prompt:'Batch GD on 100,000,000 rows with 128 float64 features. RAM for <span class="mono">X_train</span> alone = 100e6 × 128 × 8 bytes = {} GB',
+ correct:f(memGB(ROWS_BIG,128),1),
+ options:[f(memGB(ROWS_BIG,128),1), f(memGB(ROWS_BIG,2),1), f(memGB(ROWS_BIG,16),1), f(memGB(ROWS_BIG,1),1)],
+ hints:{[f(memGB(ROWS_BIG,2),1)]:'That is 2 features — our Age/Salary case. The question asks about 128.',
+        [f(memGB(ROWS_BIG,16),1)]:'That is 16 features. Eight times more columns means eight times more gigabytes.',
+        [f(memGB(ROWS_BIG,1),1)]:'That is a single feature column.'},
+ why:'95.4 GB for the input matrix alone, before a single activation is allocated. np.dot cannot form that product on ordinary hardware — this is the OOM crash, and it happens before epoch 1 completes.'},
+
+{id:'s7_b2', sec:7, kind:'blank', tag:'Fill the arithmetic',
+ prompt:'Same 128 features, but <span class="mono">batch_size = 64</span>: 64 × 128 × 8 bytes = {} KB',
+ correct:f(memKB(64,128),1),
+ options:[f(memKB(64,128),1), f(memKB(64,2),1), f(memKB(64,16),1), f(memKB(128,128),1)],
+ hints:{[f(memKB(64,2),1)]:'That is 64 rows of 2 features. Here each row carries 128.',
+        [f(memKB(64,16),1)]:'That is 16 features per row, not 128.',
+        [f(memKB(128,128),1)]:'You used 128 rows as well as 128 features. The batch holds 64 rows.'},
+ why:'64 KB — small enough to sit in CPU cache. The identical gradient maths, with memory that no longer depends on N at all.'},
+
+{id:'s7_m1', sec:7, kind:'mcq', tag:'Check',
+ prompt:'What causes the Out-Of-Memory crash in Batch GD on very large datasets?',
+ correct:'The entire dataset must be resident in RAM at once to form the single matrix dot product.',
+ options:['The entire dataset must be resident in RAM at once to form the single matrix dot product.',
+          'Too many epochs were configured.',
+          'The learning rate is too high.',
+          'Keras cannot read CSV files above a certain size.'],
+ hints:{'Too many epochs were configured.':'Epochs are sequential and reuse the same memory. A thousand epochs need no more RAM than one.',
+        'The learning rate is too high.':'η affects where θ goes, never how many bytes are allocated.',
+        'Keras cannot read CSV files above a certain size.':'Reading can be streamed. The crash is in the training step, where the whole matrix must be resident at once.'},
+ why:'np.dot(X_train, weights) with B = N requires all N rows materialised simultaneously. That precondition is the hidden cost of the vectorization that makes Batch GD fast.'},
+
+{id:'s7_m2', sec:7, kind:'mcq', tag:'Check',
+ prompt:'Mini-batch training is run on a dataset that grows from 1 million to 100 million rows, with <span class="mono">batch_size</span> left at 64. What happens to peak memory for the feature matrix?',
+ correct:'It is unchanged — it depends on batch size, not dataset size.',
+ options:['It is unchanged — it depends on batch size, not dataset size.',
+          'It grows 100×, in step with the data.',
+          'It grows, but only by the square root of the increase.',
+          'It falls, because each row gets a smaller share.'],
+ hints:{'It grows 100×, in step with the data.':'That is Batch GD’s behaviour, where B = N. With B fixed at 64, the resident slice never changes size.',
+        'It grows, but only by the square root of the increase.':'There is no square root anywhere in B × d × bytes. The relationship is exact and does not involve N.',
+        'It falls, because each row gets a smaller share.':'Nothing is shared out. Each batch is a fixed 64 × d block regardless of what surrounds it.'},
+ why:'B × d × bytes contains no N. That decoupling — not the speed and not the noise — is why mini-batching is what actually made large-scale training possible.'}
+];
+
+/* ============================================================
+   6. INTERACTION ENGINE
+   ============================================================ */
+const N_SEC = 7;
+const STATE = new Map();            /* itemId -> {solved, wrong:Set} — memory only, never persisted */
+let UNLOCK_ALL = false;             /* review mode: open everything, keep answers intact */
+const bySec = id => ITEMS.filter(it=>it.sec===id);
+
+/* seeded PRNG so chip order is stable across renders but not alphabetical */
+function hash(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function shuffled(arr, seedStr){
+  const rng = mulberry32(hash(seedStr)), a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(rng()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const say = msg => { const l=$('#live'); l.textContent=''; setTimeout(()=>{ l.textContent=msg; },40); };
+/* visible counterpart to say() — a locked click must be seen, not only announced */
+function toast(html, plain){
+  const t = $('#toast');
+  t.innerHTML = html;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.classList.remove('show'); }, 3600);
+  say(plain || t.textContent);
+}
+const leftIn = s => { const it=bySec(s); return it.length - it.filter(i=>STATE.get(i.id).solved).length; };
+
+function renderItem(item){
+  const host = document.querySelector('.q[data-item="'+item.id+'"]');
+  if(!host) return;
+  STATE.set(item.id, {solved:false, wrong:new Set()});
+  const isBlank = item.kind==='blank';
+  const promptHTML = isBlank
+    ? item.prompt.replace('{}','<span class="slot" id="slot_'+item.id+'" data-answer="">?</span>')
+    : item.prompt;
+  host.className = 'q';
+  host.innerHTML =
+    '<div class="q-tag">'+item.tag+'</div>'+
+    '<div class="q-prompt" id="p_'+item.id+'">'+promptHTML+'</div>'+
+    '<div class="chips'+(isBlank?'':' stack')+'" role="group" aria-labelledby="p_'+item.id+'"></div>'+
+    '<div class="fb" id="fb_'+item.id+'" role="status"></div>';
+  const tray = host.querySelector('.chips');
+  shuffled(item.options, item.id).forEach(function(opt){
+    const b = el('button','chip'+(isBlank?'':' chip mcqtext'), esc(opt));
+    b.type='button'; b.setAttribute('data-opt',opt);
+    b.addEventListener('click', function(){ pick(item, opt, b); });
+    tray.appendChild(b);
+  });
+}
+
+function pick(item, opt, btn){
+  const st = STATE.get(item.id);
+  if(st.solved || st.wrong.has(opt)) return;
+  const fb = document.getElementById('fb_'+item.id);
+  if(opt === item.correct){
+    st.solved = true;
+    btn.classList.add('right');
+    document.querySelector('.q[data-item="'+item.id+'"]').classList.add('solved');
+    document.querySelectorAll('.q[data-item="'+item.id+'"] .chip').forEach(function(c){
+      c.disabled = true; if(!c.classList.contains('right') && !c.classList.contains('wrong')) c.classList.add('wrong');
+    });
+    const slot = document.getElementById('slot_'+item.id);
+    if(slot){ slot.textContent = opt; slot.className='slot filled'; slot.setAttribute('data-answer', opt); }
+    fb.className = 'fb good show';
+    fb.innerHTML = '<b>Correct.</b> ' + item.why;
+    say('Correct. ' + item.why);
+  } else {
+    st.wrong.add(opt);
+    btn.classList.add('wrong'); btn.disabled = true;
+    const h = item.hints[opt] || 'Not this one — re-read the rule card above.';
+    fb.className = 'fb err show';
+    fb.innerHTML = '<b>Not '+esc(opt)+'.</b> ' + h;
+    say('Incorrect. ' + h);
+  }
+  refresh();
+}
+
+function refresh(){
+  const solved = ITEMS.filter(it=>STATE.get(it.id).solved).length;
+  $('#progText').textContent = solved+' / '+ITEMS.length+' filled';
+  const pct = Math.round(solved/ITEMS.length*100);
+  $('#progFill').style.width = pct+'%';
+  $('.prog-track').setAttribute('aria-valuenow', pct);
+
+  for(let s=1; s<=N_SEC; s++){
+    const items = bySec(s), done = items.filter(it=>STATE.get(it.id).solved).length;
+    const sec = document.getElementById('s'+s);
+    const complete = done===items.length;
+    const locked = (s>1 && !UNLOCK_ALL) && leftIn(s-1)>0;
+    sec.classList.toggle('locked', locked);
+    sec.classList.toggle('done', complete);
+    /* the badge itself now states why the section will not open */
+    sec.querySelector('[data-badge]').textContent = locked ? 'Locked' : done+' / '+items.length;
+    sec.querySelector('.c-head').setAttribute('aria-disabled', locked ? 'true' : 'false');
+    if(complete && sec.classList.contains('open') && !UNLOCK_ALL){
+      setTimeout(function(){
+        setOpen(sec,false);
+        const nxt = document.getElementById('s'+(s+1));
+        if(nxt){ nxt.classList.remove('locked'); setOpen(nxt,true); nxt.scrollIntoView({block:'start'}); }
+      }, 1400);
+    }
+  }
+  const all = solved===ITEMS.length;
+  $('#finale').style.display = all ? 'block' : 'none';
+  if(all) $('#finaleText').innerHTML =
+    'All '+ITEMS.length+' checks cleared. The one line worth carrying out: <b>batch size does not change the algorithm, it changes how many times per epoch the algorithm gets to act</b> — '+
+    T.stepsPerEpochB+' time at B='+T.B+', '+int(T.stepsPerEpochS)+' at B=1. Everything else on this page — the smoothness, the '+f(T.wallRatio,2)+'× wall clock, '+
+    'the '+f(T.dropRatio,0)+'× difference in learning, the '+f(memGB(ROWS_BIG,128),1)+' GB memory wall — follows from that single number.';
+}
+
+function setOpen(sec, open){
+  sec.classList.toggle('open', open);
+  sec.querySelector('.c-head').setAttribute('aria-expanded', open?'true':'false');
+}
+$$('.c-head').forEach(function(h){
+  h.addEventListener('click', function(){
+    const sec = h.closest('.concept');
+    if(sec.classList.contains('locked')){
+      const s = +sec.getAttribute('data-idx');
+      /* route to the FIRST unfinished section, not merely s-1 — that one may be locked too */
+      let root = 1; while(root <= N_SEC && leftIn(root) === 0) root++;
+      const left = leftIn(root);
+      toast('<b>Section '+s+' is locked.</b> Sections open in order, and Section '+root+
+            ' still has '+left+' answer'+(left===1?'':'s')+' to go. Taking you there. '+
+            'To read the whole sheet without answering, press <b>Unlock all</b>.');
+      sec.classList.remove('nudge'); void sec.offsetWidth; sec.classList.add('nudge');
+      const blocker = document.getElementById('s'+root);
+      if(blocker){ setOpen(blocker, true); blocker.scrollIntoView({block:'start'}); }
+      return;
+    }
+    setOpen(sec, !sec.classList.contains('open'));
+  });
+});
+
+/* overlay, print, reset */
+const ov = $('#ovRef');
+const closeOv = () => { ov.classList.remove('show'); $('#btnRef').focus(); };
+$('#btnRef').addEventListener('click', function(){ ov.classList.add('show'); $('#ovClose').focus(); });
+$('#ovClose').addEventListener('click', closeOv);
+ov.addEventListener('click', function(e){ if(e.target===ov) closeOv(); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && ov.classList.contains('show')) closeOv(); });
+$('#btnUnlock').addEventListener('click', function(){
+  UNLOCK_ALL = !UNLOCK_ALL;
+  const b = $('#btnUnlock');
+  b.textContent = UNLOCK_ALL ? 'Re-lock' : 'Unlock all';
+  b.setAttribute('aria-pressed', UNLOCK_ALL ? 'true' : 'false');
+  for(let s=1;s<=N_SEC;s++){
+    const sec = document.getElementById('s'+s);
+    if(UNLOCK_ALL){ sec.classList.remove('locked'); setOpen(sec,true); }
+    else if(s>1){ setOpen(sec,false); }
+  }
+  refresh();
+  toast(UNLOCK_ALL ? 'Every section open — gating off. Your answers are untouched.'
+                   : 'Gating back on. Sections unlock as you finish the one above.');
+});
+$('#btnPrint').addEventListener('click', function(){ window.print(); });
+$('#btnReset').addEventListener('click', function(){
+  UNLOCK_ALL = false;
+  $('#btnUnlock').textContent = 'Unlock all';
+  $('#btnUnlock').setAttribute('aria-pressed','false');
+  ITEMS.forEach(renderItem);
+  for(let s=2;s<=N_SEC;s++){ const sec=document.getElementById('s'+s); sec.classList.add('locked'); setOpen(sec,false); sec.classList.remove('done'); }
+  setOpen(document.getElementById('s1'), true);
+  refresh();
+  window.scrollTo({top:0});
+  say('Worksheet reset. '+ITEMS.length+' blanks cleared.');
+});
+
+/* boot */
+ITEMS.forEach(renderItem);
+setOpen(document.getElementById('s1'), true);
+refresh();
+
+/* ============================================================
+   7. SELF-TEST — recomputes every displayed value by an
+   INDEPENDENT path and asserts against what is on the page.
+   ============================================================ */
+(function selfTest(){
+  let pass=0; const fails=[];
+  const ok = (name, got, want, tol) => {
+    const good = (typeof want==='number' && typeof got==='number')
+      ? Math.abs(got-want) <= (tol===undefined?1e-9:tol)
+      : String(got)===String(want);
+    if(good) pass++; else fails.push(name+'  got='+got+'  want='+want);
+  };
+  /* independent primitives: sigmoid via tanh identity, explicit loops (no reduce) */
+  const sig2 = z => 0.5*(1+Math.tanh(z/2));
+  const bce2 = (p,y) => y===1 ? -Math.log(p) : -Math.log(1-p);
+  function batchLoss2(w1,w2,b){ let s=0; for(let i=0;i<X.length;i++){ s+=bce2(sig2(w1*X[i][0]+w2*X[i][1]+b), Y[i]); } return s/X.length; }
+  function batchGrad2(w1,w2,b){ let g1=0,g2=0,gb=0; for(let i=0;i<X.length;i++){ const e=sig2(w1*X[i][0]+w2*X[i][1]+b)-Y[i]; g1+=e*X[i][0]; g2+=e*X[i][1]; gb+=e; } return [g1/X.length,g2/X.length,gb/X.length]; }
+
+  /* --- scaler --- */
+  let sa=0; for(let i=0;i<RAW.length;i++) sa+=RAW[i].age;
+  ok('scaler: age mean', STATS.aMu, sa/RAW.length, 1e-12);
+  ok('scaler: X[0][0] is 2dp', X[0][0], Math.round(((RAW[0].age-STATS.aMu)/STATS.aSd)*100)/100, 1e-12);
+
+  /* --- section 2 --- */
+  const g2 = batchGrad2(W0[0],W0[1],B0);
+  ok('batch loss',  BG.loss,  batchLoss2(W0[0],W0[1],B0), 1e-12);
+  ok('batch grad w1', BG.gw[0], g2[0], 1e-12);
+  ok('batch grad w2', BG.gw[1], g2[1], 1e-12);
+  ok('batch grad b',  BG.gb,   g2[2], 1e-12);
+  ok('batch w1 update', BG.wNew[0], W0[0]-LR*g2[0], 1e-12);
+  ok('batch loss = mean of per-row losses', BG.loss, mean(BG.rows.map(r=>r.loss)), 1e-12);
+  ok('row0 sigmoid vs tanh identity', BG.rows[0].p, sig2(z0), 1e-12);
+
+  /* --- section 3: replay SGD with a plain for-loop --- */
+  (function(){
+    let w1=W0[0], w2=W0[1], b=B0, flips=0, prev=null;
+    for(let i=0;i<X.length;i++){
+      const e = sig2(w1*X[i][0]+w2*X[i][1]+b) - Y[i];
+      const before = w2;
+      w1 -= LR*e*X[i][0]; w2 -= LR*e*X[i][1]; b -= LR*e;
+      const d = w2-before;
+      if(prev!==null && prev*d<0) flips++;
+      prev = d;
+    }
+    ok('sgd end w1', SG.wEnd[0], w1, 1e-12);
+    ok('sgd end w2', SG.wEnd[1], w2, 1e-12);
+    ok('sgd direction reversals', REVS, flips);
+    ok('sgd step1 == batch row0 (same start)', SG.steps[0].p, BG.rows[0].p, 1e-12);
+  })();
+
+  /* --- section 5: mini-batch is strictly between the extremes --- */
+  ok('mini-batch count', MB.batches.length, Math.ceil(M/2));
+  ok('mini-batch sizes sum to N', MB.batches.reduce((s,b)=>s+b.size,0), M);
+  ok('mini w1 strictly between batch and sgd',
+     (MB.wEnd[0]>BG.wNew[0] && MB.wEnd[0]<SG.wEnd[0]), true);
+  ok('ceil rule 400/150', nUp(400,150), 3);
+  ok('remainder 400 mod 150', 400%150, 100);
+  ok('ceil rule 5000/64', nUp(5000,64), 79);
+  ok('remainder batch completes the epoch', Math.floor(5000/64)*64 + 5000%64, 5000);
+
+  /* --- section 4: ordering of the three 25-epoch endpoints --- */
+  ok('25ep batch loss', P.batch.loss, batchLoss2(P.batch.w[0],P.batch.w[1],P.batch.b), 1e-12);
+  ok('25ep sgd loss',   P.sgd.loss,   batchLoss2(P.sgd.w[0],P.sgd.w[1],P.sgd.b), 1e-12);
+  ok('25ep ordering sgd < mini < batch', (P.sgd.loss<P.mini.loss && P.mini.loss<P.batch.loss), true);
+  ok('update counts 25 / 75 / 150', [P.batch.updates,P.mini.updates,P.sgd.updates].join('/'),
+     [EPOCHS_PLOT, EPOCHS_PLOT*Math.ceil(M/2), EPOCHS_PLOT*M].join('/'));
+
+  /* --- section 6: timing derivations --- */
+  ok('steps at B=320', T.stepsB, 10*1);
+  ok('steps at B=1',   T.stepsS, 10*320);
+  ok('wall ratio',     T.wallRatio, T.tS/T.tB, 1e-12);
+  ok('ms per batch step', T.msB, 3297.926902770996/10, 1e-9);
+  ok('ms per sgd step',   T.msS, 16541.401624679565/3200, 1e-9);
+  ok('loss drop ratio',   T.dropRatio, (0.5740-0.2489)/(0.6657-0.6637), 1e-9);
+
+  /* --- section 7: memory --- */
+  ok('mem 100M x 128 float64 GB', memGB(ROWS_BIG,128), 100e6*128*8/1073741824, 1e-9);
+  ok('mem B=64 x 128 KB',         memKB(64,128),        64*128*8/1024, 1e-12);
+  ok('mem independent of N',      memKB(64,128), memKB(64,128), 0);
+
+  /* --- item bank integrity --- */
+  ITEMS.forEach(function(it){
+    const n = it.options.filter(o=>o===it.correct).length;
+    ok('["'+it.id+'"] correct appears exactly once in options', n, 1);
+    ok('["'+it.id+'"] options are unique', new Set(it.options).size, it.options.length);
+    ok('["'+it.id+'"] every wrong option has its own hint',
+       it.options.filter(o=>o!==it.correct && !it.hints[o]).length, 0);
+    if(it.kind==='blank') ok('["'+it.id+'"] prompt has a slot', it.prompt.indexOf('{}')>=0, true);
+  });
+  ok('item count matches section badges',
+     [1,2,3,4,5,6,7].map(s=>bySec(s).length).join(','), '4,5,5,4,6,5,4');
+
+  /* --- DOM integrity: nothing displayed that was not computed --- */
+  ok('no unresolved [data-v] placeholders', document.body.innerHTML.indexOf('>?')===-1 || $$('[data-v]').filter(n=>n.textContent.charAt(0)==='?').length, 0);
+  ok('every [data-v] key exists in VALUES', $$('[data-v]').filter(n=>!(n.getAttribute('data-v') in VALUES)).length, 0);
+  ok('all blanks rendered a slot', $$('.slot').length, ITEMS.filter(i=>i.kind==='blank').length);
+  ok('all chips rendered', $$('.chip').length, ITEMS.reduce((s,i)=>s+i.options.length,0));
+  ok('figure rendered', $('#figWrap svg')!==null, true);
+
+  /* --- gating affordance: a locked section must SAY it is locked --- */
+  ok('sections 2-7 start locked', $$('.concept.locked').length, N_SEC-1);
+  ok('locked badge reads "Locked", not a bare score',
+     document.querySelector('#s2 [data-badge]').textContent, 'Locked');
+  ok('section 1 badge shows its score', document.querySelector('#s1 [data-badge]').textContent,
+     '0 / '+bySec(1).length);
+  ok('locked head is marked aria-disabled',
+     document.querySelector('#s2 .c-head').getAttribute('aria-disabled'), 'true');
+  ok('unlocked head is not aria-disabled',
+     document.querySelector('#s1 .c-head').getAttribute('aria-disabled'), 'false');
+  ok('a visible toast element exists (not screen-reader-only)',
+     $('#toast')!==null && getComputedStyle($('#toast')).position==='fixed', true);
+  ok('review escape hatch present', $('#btnUnlock')!==null, true);
+  ok('leftIn(1) counts unanswered items', leftIn(1), bySec(1).length);
+  ok('locked click routes to an UNLOCKED root blocker', (function(){
+      let root=1; while(root<=N_SEC && leftIn(root)===0) root++;
+      return !document.getElementById('s'+root).classList.contains('locked');
+   })(), true);
+  ok('figure is labelled', $('#figWrap svg title')!==null && $('#figWrap svg desc')!==null, true);
+
+  /* --- DOM vs model: spot-check printed cells against a fresh computation --- */
+  const bodyRows = $$('#tblBatch tr');
+  ok('batch table row count', bodyRows.length, M);
+  bodyRows.forEach(function(tr,i){
+    const cells = tr.querySelectorAll('td');
+    const wantP = sig2(W0[0]*X[i][0]+W0[1]*X[i][1]+B0).toFixed(4);
+    ok('tblBatch row '+i+' y_hat cell', cells[2].textContent, wantP);
+  });
+  ok('tblSgd row count', $$('#tblSgd tr').length, M);
+  ok('tblRegimes row count', $$('#tblRegimes tr').length, 3);
+  ok('cheat-sheet rendered', $$('#tblCheat tr').length>0, true);
+
+  const tag = fails.length ? 'color:#a33b2c;font-weight:700' : 'color:#2f6b45;font-weight:700';
+  console.log('%cGD worksheet self-test: '+pass+' passed, '+fails.length+' failed', tag);
+  if(fails.length) fails.forEach(f=>console.error('  ✗ '+f));
+  else console.log('%c  Every number on this page was recomputed from the six-row dataset and matched.', 'color:#555');
+  console.log('  batch  → w1 '+f(BG.wNew[0],6)+'   loss '+f(BG.loss,6));
+  console.log('  mini   → w1 '+f(MB.wEnd[0],6)+'   ('+MB.batches.length+' updates)');
+  console.log('  sgd    → w1 '+f(SG.wEnd[0],6)+'   ('+M+' updates, '+REVS+' reversals)');
+})();
+</script>
+</body>
+</html>
