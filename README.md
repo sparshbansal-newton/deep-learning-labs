@@ -16,9 +16,9 @@ no server, and no external data to download.
 ## Adding a lab
 
 1. Place the new `.html` file in the repository root.
-2. In `index.html`, copy the commented card template above the lab list, paste
-   it inside `<section class="labs">`, and edit the link, kicker, title,
-   summary, tags and footer fields.
+2. In `index.html`, copy the commented `<li>` template above the list, paste
+   it inside `<ol class="list">`, and edit the link, tag, title, summary and
+   covers line.
 
-Lab numbers and the two on-page counts are derived from the list at render
-time, so no other text in `index.html` needs to be changed.
+The page states no counts or totals, so nothing outside the pasted block
+ever needs to be edited.

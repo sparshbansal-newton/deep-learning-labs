@@ -2,228 +2,119 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Deep Learning 2026 — Interactive Labs</title>
-<meta name="description" content="Interactive laboratory exercises for the Deep Learning 2026 course. Each lab is a self-contained page that runs in the browser.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deep Learning: Interactive Labs</title>
+<meta name="description" content="Interactive, self-contained labs for a deep learning course: gradient descent regimes and the PyTorch data pipeline.">
 <style>
 :root{
-  --navy:#0f2440; --navy-2:#1b3c69; --navy-3:#3f6394;
-  --amber:#c67c11; --amber-2:#e9a52b;
-  --cream:#faf6ec; --paper:#fffdf8; --ink:#22262c; --ink-2:#555c66; --ink-3:#7b838e;
-  --rule:#ddd6c4; --rule-2:#c9c0aa;
-  --serif:"Source Serif 4",Cambria,Georgia,"Times New Roman",serif;
-  --sans:"Source Sans 3",Calibri,"Segoe UI",system-ui,-apple-system,sans-serif;
-  --mono:"JetBrains Mono",Consolas,"SF Mono",Menlo,monospace;
-  --sh:0 1px 2px rgba(15,36,64,.06),0 6px 18px rgba(15,36,64,.06);
-  --sh-hi:0 2px 4px rgba(15,36,64,.08),0 14px 34px rgba(15,36,64,.13);
-  --maxw:1080px;
+  --ink:#0F2440; --blue:#1B3C69; --blue-2:#3F6394; --amber:#C67C11; --plum:#6D2E46;
+  --cream:#FDF3E0; --creamb:#E3C892; --grey:#525A65; --lgrey:#8B939E;
+  --rule:#E0DBD0; --paper:#FFFDF9;
+  --serif:Cambria,Georgia,"Times New Roman",serif;
+  --sans:Calibri,"Segoe UI",Tahoma,system-ui,-apple-system,sans-serif;
+  --mono:Consolas,"Cascadia Mono",ui-monospace,Menlo,monospace;
+  --r:10px;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
-h1,h2,h3{font-family:var(--serif);color:var(--navy);font-weight:700;line-height:1.2;margin:0;letter-spacing:-.008em}
-p{margin:.65em 0}
-a{color:var(--navy-2)}
-code{font-family:var(--mono);font-size:.86em}
-.wrap{max-width:var(--maxw);margin:0 auto;padding:0 1.2rem}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#fff;color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55}
+.wrap{max-width:840px;margin:0 auto;padding:54px 24px 78px}
 
-/* ---- top rail ---- */
-.rail{background:var(--navy);color:#fff;border-bottom:3px solid var(--amber)}
-.rail-in{max-width:var(--maxw);margin:0 auto;padding:.5rem 1.2rem;display:flex;align-items:baseline;gap:.7rem;flex-wrap:wrap}
-.rail b{font-family:var(--serif);font-size:1rem;font-weight:700}
-.rail span{font-size:.74rem;letter-spacing:.15em;text-transform:uppercase;color:#9db4d2;margin-left:auto}
+header{border-bottom:2px solid var(--ink);padding-bottom:22px;margin-bottom:32px}
+.eyebrow{font-size:12.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--amber);font-weight:700;margin:0 0 10px}
+h1{font-family:var(--serif);font-weight:700;font-size:38px;line-height:1.15;margin:0 0 12px;letter-spacing:-.01em}
+.lede{font-family:var(--serif);font-size:19px;color:var(--grey);margin:0;max-width:62ch;line-height:1.5}
 
-/* ---- masthead ---- */
-.hero{background:
-    radial-gradient(900px 340px at 12% -30%,rgba(233,165,43,.16),transparent 65%),
-    linear-gradient(178deg,#12294a 0%,var(--navy) 58%,#0b1c33 100%);
-  color:#eef3f9;padding:3rem 0 2.6rem;position:relative;overflow:hidden}
-.hero::after{content:"";position:absolute;inset:auto 0 0 0;height:1px;background:linear-gradient(90deg,transparent,rgba(233,165,43,.55),transparent)}
-.hero .eyebrow{font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;color:var(--amber-2);font-weight:700}
-.hero h1{font-size:clamp(2.2rem,5.4vw,3.1rem);color:#fff;margin:.5rem 0 .55rem}
-.hero .lede{font-size:1.04rem;color:#c6d5e6;max-width:64ch}
-.facts{display:flex;gap:1.1rem;flex-wrap:wrap;margin-top:1.7rem;padding-top:1.2rem;border-top:1px solid rgba(255,255,255,.14);
-  font-size:.79rem;letter-spacing:.09em;text-transform:uppercase;color:#93a9c4}
-.facts b{color:var(--amber-2);font-weight:700}
+.note{background:var(--cream);border:1px solid var(--creamb);border-left:4px solid var(--amber);
+  border-radius:0 var(--r) var(--r) 0;padding:14px 17px;margin:0 0 32px;font-size:15.5px;color:#5A4420}
+.note b{color:#4A3616}
 
-/* ---- guidance ---- */
-.how{padding:2.5rem 0 .4rem}
-.how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1.6rem 2.2rem}
-.step{padding-top:.85rem;border-top:2px solid var(--rule-2)}
-.step em{font-family:var(--mono);font-style:normal;font-size:.76rem;letter-spacing:.1em;color:var(--amber);font-weight:600}
-.step h3{font-size:1.02rem;margin:.25rem 0 .2rem}
-.step p{margin:0;font-size:.92rem;color:var(--ink-2)}
+h2.sec{font-size:12.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--lgrey);font-weight:700;
+  margin:0 0 16px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
 
-/* ---- section head ---- */
-.shead{display:flex;align-items:center;gap:1rem;margin:2.9rem 0 1.5rem}
-.shead h2{font-size:1.32rem;white-space:nowrap}
-.shead .line{flex:1;height:1px;background:var(--rule)}
-.shead .count{font-family:var(--mono);font-size:.78rem;color:var(--ink-3);white-space:nowrap}
+/* Each entry is one <li> containing one <a class="card">. Adding an entry
+   requires nothing outside its own block: there are no counts or numbers
+   anywhere else on this page. */
+ol.list{list-style:none;margin:0;padding:0}
+ol.list li{margin:0 0 14px}
+a.card{display:block;text-decoration:none;color:inherit;background:var(--paper);
+  border:1px solid var(--rule);border-radius:var(--r);padding:18px 20px 17px;
+  transition:border-color .15s ease,box-shadow .15s ease,transform .15s ease}
+a.card:hover{border-color:var(--blue-2);transform:translateY(-1px);
+  box-shadow:0 2px 4px rgba(15,36,64,.05),0 12px 28px -14px rgba(15,36,64,.38)}
+a.card:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
 
-/* ---- lab index ---- */
-/* Cards are numbered automatically by this counter — the markup carries no
-   lab number, so a new <a class="lab"> can be inserted anywhere in the list. */
-.labs{display:grid;gap:1.15rem;padding-bottom:1rem;counter-reset:lab}
-.lab{counter-increment:lab;display:grid;grid-template-columns:88px 1fr;background:var(--paper);border:1px solid var(--rule);border-radius:12px;box-shadow:var(--sh);overflow:hidden;text-decoration:none;color:inherit;transition:transform .18s cubic-bezier(.4,0,.2,1),box-shadow .18s,border-color .18s}
-.lab:hover,.lab:focus-visible{transform:translateY(-3px);box-shadow:var(--sh-hi);border-color:var(--navy-3);outline:none}
-.lab:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
-.lab-no{background:linear-gradient(170deg,var(--navy-2),var(--navy));color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;padding:1.4rem .5rem}
-.lab-no::before{content:counter(lab,decimal-leading-zero);font-family:var(--serif);font-size:1.85rem;font-weight:700;line-height:1}
-.lab-no::after{content:"Lab";font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:#9db4d2}
-.lab-body{padding:1.3rem 1.5rem 1.2rem}
-.lab-kicker{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:700}
-.lab h3{font-size:1.3rem;margin:.3rem 0 .35rem}
-.lab p{margin:0 0 .85rem;color:var(--ink-2);font-size:.96rem;max-width:66ch}
-.tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.9rem}
-.tags i{font-style:normal;font-family:var(--mono);font-size:.74rem;color:var(--navy-2);background:#eaf0f8;border:1px solid #d3dfee;border-radius:99px;padding:.16rem .58rem}
-.lab-foot{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;padding-top:.75rem;border-top:1px dashed var(--rule-2);font-size:.83rem;color:var(--ink-3)}
-.lab-foot .go{margin-left:auto;font-weight:700;color:var(--navy-2);font-size:.88rem}
-.lab:hover .go{color:var(--amber)}
-.lab-foot .go::after{content:" \2192";transition:.18s}
-.lab:hover .go::after{margin-left:.2rem}
+.tag{display:inline-block;font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;
+  text-transform:uppercase;font-weight:700;padding:3px 9px;border-radius:6px;margin-bottom:9px}
+.tag.lab{background:#EAF0F8;color:var(--blue)}
+.tag.notes{background:#F3EDF0;color:var(--plum)}
 
-/* ---- footer ---- */
-footer{margin-top:3.2rem;border-top:1px solid var(--rule);background:var(--paper)}
-.foot-in{max-width:var(--maxw);margin:0 auto;padding:1.6rem 1.2rem 2.4rem;display:flex;gap:.7rem;flex-wrap:wrap;font-size:.85rem;color:var(--ink-3)}
-.foot-in b{color:var(--navy)}
+.card h3{font-family:var(--serif);font-size:22px;font-weight:700;margin:0 0 6px;line-height:1.25}
+a.card:hover h3{color:var(--blue)}
+.card p{margin:0;font-size:15.5px;color:var(--grey);line-height:1.5}
+.card p.covers{margin:11px 0 0;font-family:var(--mono);font-size:12.5px;color:var(--lgrey);
+  letter-spacing:.02em;line-height:1.45}
+
+footer{margin-top:42px;padding-top:20px;border-top:1px solid var(--rule);font-size:14.5px;color:var(--lgrey)}
+footer a{color:var(--blue)}
 
 @media (max-width:560px){
-  .lab{grid-template-columns:1fr}
-  .lab-no{flex-direction:row;gap:.6rem;padding:.6rem 1.1rem;justify-content:flex-start;align-items:baseline}
-  .lab-no::before{font-size:1.2rem}
+  .wrap{padding:34px 18px 58px}
+  h1{font-size:29px}
+  .lede{font-size:17px}
+  body{font-size:16px}
 }
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<div class="rail">
-  <div class="rail-in">
-    <b>Deep Learning</b>
-    <span>Session 2026</span>
-  </div>
-</div>
-
-<header class="hero">
-  <div class="wrap">
-    <div class="eyebrow">Deep Learning · 2026</div>
-    <h1>Interactive Labs</h1>
-    <p class="lede">Laboratory exercises for the Deep Learning course. Each lab treats one topic in full: the rule is stated, applied to a worked example, and then implemented in code, with interactive controls that recompute every value so results can be verified step by step.</p>
-    <div class="facts">
-      <span><b id="factCount">—</b> labs</span>
-      <span>·</span>
-      <span>Runs in the browser</span>
-      <span>·</span>
-      <span>No installation required</span>
-    </div>
-  </div>
+<header>
+  <p class="eyebrow">Deep Learning</p>
+  <h1>Interactive Labs</h1>
+  <p class="lede">Laboratory exercises for the Deep Learning course. Each lab treats one topic in full — the rule is stated, applied to a worked example, then implemented in code — on a single self-contained page.</p>
 </header>
 
-<main class="wrap">
+<p class="note"><b>How to use these:</b> every page runs entirely in your browser. Work each quantity out by hand first, then adjust the controls and check your result against the value the page computes.</p>
 
-  <section class="how">
-    <div class="how-grid">
-      <div class="step">
-        <em>01</em>
-        <h3>Compute before you check</h3>
-        <p>Work each quantity out by hand first. The controls are there to confirm a result, not to supply it.</p>
-      </div>
-      <div class="step">
-        <em>02</em>
-        <h3>Vary the parameters</h3>
-        <p>Adjust the inputs and observe how the dependent values respond. The relationship is the object of study.</p>
-      </div>
-      <div class="step">
-        <em>03</em>
-        <h3>Responses are not stored</h3>
-        <p>Work is held in the browser tab only. Reloading a page clears it, and any lab may be repeated.</p>
-      </div>
-    </div>
-  </section>
+<h2 class="sec">The labs</h2>
 
-  <div class="shead">
-    <h2>Lab index</h2>
-    <div class="line"></div>
-    <div class="count"><span id="indexCount">—</span> listed</div>
-  </div>
+<!-- ==================================================================
+     ADDING AN ENTRY
+     Copy one <li> block below, place it anywhere in this list, and edit
+     the five marked fields. Nothing outside the block needs to change.
+     The tag class is either "lab" (blue) or "notes" (plum).
 
-  <!-- ================================================================
-       ADDING A LAB
-       Copy the block below, place it anywhere in this list, and edit the
-       four marked fields. Lab numbers, the header count and the index
-       count are all derived automatically — no other text needs changing.
+     <li><a class="card" href="FILENAME.html">
+       <span class="tag lab">LABEL</span>
+       <h3>TITLE</h3>
+       <p>ONE-SENTENCE SUMMARY</p>
+       <p class="covers">topic · topic · topic</p>
+     </a></li>
+     ================================================================== -->
 
-       <a class="lab" href="FILENAME.html">
-         <div class="lab-no"></div>
-         <div class="lab-body">
-           <div class="lab-kicker">AREA · SUBAREA</div>
-           <h3>TITLE</h3>
-           <p>ONE-PARAGRAPH SUMMARY</p>
-           <div class="tags"><i>topic</i><i>topic</i></div>
-           <div class="lab-foot">
-             <span>SCOPE</span><span>·</span><span>TOOLING</span>
-             <span class="go">Open lab</span>
-           </div>
-         </div>
-       </a>
-       ================================================================ -->
+<ol class="list">
 
-  <section class="labs" id="labList">
+  <li><a class="card" href="gradient-descent-lab.html">
+    <span class="tag lab">Lab 01</span>
+    <h3>Gradient Descent: Batch, Stochastic and Mini-Batch</h3>
+    <p>The three regimes are one algorithm under a single parameter: how many examples are observed before the weights are updated. A six-row dataset is carried through every section, so the derivation and the printed values correspond exactly.</p>
+    <p class="covers">batch GD · stochastic GD · mini-batch · epochs · convergence path · memory cost</p>
+  </a></li>
 
-    <a class="lab" href="gradient-descent-lab.html">
-      <div class="lab-no"></div>
-      <div class="lab-body">
-        <div class="lab-kicker">Optimisation · Training Loop</div>
-        <h3>Gradient Descent: Batch, Stochastic and Mini-Batch</h3>
-        <p>The three regimes are one algorithm under a single parameter: the number of examples observed before the weights are updated. A six-row dataset is carried through every section, so the derivation and the printed variables correspond exactly.</p>
-        <div class="tags"><i>batch GD</i><i>stochastic GD</i><i>mini-batch</i><i>epochs</i><i>convergence path</i><i>memory cost</i></div>
-        <div class="lab-foot">
-          <span>Seven sections, released in sequence</span>
-          <span>·</span>
-          <span>NumPy and Keras <code>.fit()</code></span>
-          <span class="go">Open lab</span>
-        </div>
-      </div>
-    </a>
+  <li><a class="card" href="dataset-dataloader-lab.html">
+    <span class="tag lab">Lab 02</span>
+    <h3>Datasets and DataLoaders in PyTorch</h3>
+    <p>Why a full dataset cannot be passed to the model in one step, and how the two abstractions divide the work. A <code>Dataset</code> is built from its three required methods, then a <code>DataLoader</code> is configured around it.</p>
+    <p class="covers">Dataset · DataLoader · transforms · samplers · collate_fn · num_workers</p>
+  </a></li>
 
-    <a class="lab" href="dataset-dataloader-lab.html">
-      <div class="lab-no"></div>
-      <div class="lab-body">
-        <div class="lab-kicker">PyTorch · Data Pipeline</div>
-        <h3>Datasets and DataLoaders in PyTorch</h3>
-        <p>Why a full dataset cannot be passed to the model in one step, and how the two abstractions divide the work between them. A <code>Dataset</code> is constructed from its three required methods, then a <code>DataLoader</code> is configured around it: batching, shuffling, collation and worker processes.</p>
-        <div class="tags"><i>Dataset</i><i>DataLoader</i><i>transforms</i><i>samplers</i><i>collate_fn</i><i>num_workers</i></div>
-        <div class="lab-foot">
-          <span>Thirteen sections with a closing assessment</span>
-          <span>·</span>
-          <span>PyTorch</span>
-          <span class="go">Open lab</span>
-        </div>
-      </div>
-    </a>
-
-  </section>
-</main>
+</ol>
 
 <footer>
-  <div class="foot-in">
-    <span><b>Deep Learning 2026</b> — Interactive Labs</span>
-    <span>·</span>
-    <span>Each page is self-contained and remains usable offline.</span>
-  </div>
+  <p>Built for classroom use. Source on <a href="https://github.com/sparshbansal-newton/deep-learning-labs">GitHub</a>. Corrections welcome.</p>
 </footer>
 
-<script>
-// Counts are read from the list itself so that adding or removing a lab
-// card requires no change to the surrounding text.
-(function(){
-  var n = document.querySelectorAll('#labList .lab').length;
-  document.getElementById('factCount').textContent = n;
-  document.getElementById('indexCount').textContent = n;
-})();
-</script>
-
+</div>
 </body>
 </html>
