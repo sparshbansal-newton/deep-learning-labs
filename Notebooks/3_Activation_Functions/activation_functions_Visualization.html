@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Activation Functions Explorer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root{
+    --bg:#f7f7f5; --panel:#ffffff; --border:#e1e0d9; --text:#0b0b0b; --text2:#52514e; --text3:#898781;
+    --blue:#2a78d6; --green:#1baf7a; --amber:#eda100; --red:#e34948; --purple:#4a3aa7; --gray:#71706b; --orange:#eb6834;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; padding:24px; background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;}
+  h1{font-size:20px; font-weight:600; margin:0 0 4px;}
+  .subtitle{color:var(--text2); font-size:13px; margin:0 0 20px;}
+  .layout{display:grid; grid-template-columns:280px 1fr; gap:20px; max-width:1400px; margin:0 auto;}
+  @media (max-width:900px){ .layout{grid-template-columns:1fr;} }
+
+  .panel{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px;}
+  .panel h2{font-size:14px; font-weight:600; margin:0 0 10px;}
+  .unit-block{margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid var(--border);}
+  .unit-block:last-of-type{border-bottom:none;}
+  .unit-title{font-size:12px; font-weight:600; margin:0 0 6px;}
+  .row{display:flex; justify-content:space-between; font-size:11px; color:var(--text2); margin-top:8px;}
+  .row span.val{color:var(--text); font-weight:600;}
+  input[type=range]{width:100%; accent-color:var(--blue); margin-top:2px;}
+  button{width:100%; margin-top:10px; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--panel); font-size:13px; cursor:pointer; color:var(--text);}
+  button:hover{background:#f0efec;}
+
+  .act-select{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;}
+  .act-btn{padding:8px 14px; border-radius:20px; border:1px solid var(--border); background:var(--panel); font-size:13px; cursor:pointer; color:var(--text2);}
+  .act-btn.active{background:var(--blue); color:#fff; border-color:var(--blue);}
+
+  .top-row{display:grid; grid-template-columns:1fr 1.3fr; gap:16px; margin-bottom:16px;}
+  @media (max-width:700px){ .top-row{grid-template-columns:1fr;} }
+  .main-chart{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px;}
+  .main-chart h2{font-size:14px; font-weight:600; margin:0 0 4px;}
+  .formula{font-size:12px; color:var(--text2); margin:0 0 10px;}
+  .chart-wrap{position:relative; height:220px;}
+  .chart-wrap.tall{height:260px;}
+
+  .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px;}
+  @media (max-width:700px){ .grid3{grid-template-columns:1fr;} }
+  .cell{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:12px;}
+  .cell-label{font-size:12px; color:var(--text2); margin:0 0 8px; font-weight:600;}
+  .cell-chart{position:relative; height:200px;}
+
+  .section-title{font-size:15px; font-weight:600; margin:28px 0 12px;}
+  .compare-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  @media (max-width:700px){ .compare-grid{grid-template-columns:1fr;} }
+  .compare-cell{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:10px;}
+  .compare-cell-chart{position:relative; height:150px;}
+
+  .softmax-panel{display:grid; grid-template-columns:220px 1fr; gap:16px;}
+  @media (max-width:700px){ .softmax-panel{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<h1>Activation functions explorer</h1>
+<p class="subtitle">Same tiny network (1 input &rarr; 3 hidden units &rarr; 1 output) with fixed weights. Only the activation function changes. Pick one below and watch the output shape change.</p>
+
+<div class="panel" style="max-width:900px; margin:0 auto 20px;">
+  <svg width="100%" viewBox="0 0 900 490" role="img">
+  <title>Shallow neural network diagram with weighted sum and activation as separate blocks</title>
+  <desc>1 input x feeds 3 weighted-sum blocks (z=w*x+b), each followed by a separate activation block (a=f(z)), combined into output y</desc>
+  <defs>
+  <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+
+  <text x="90" y="34" font-size="12" fill="#898781">Input</text>
+  <text x="265" y="34" font-size="12" fill="#898781">Weighted sum</text>
+  <text x="460" y="34" font-size="12" fill="#898781">Activation</text>
+  <text x="800" y="34" font-size="12" fill="#898781">Output</text>
+
+  <circle cx="60" cy="240" r="30" fill="#E6F1FB" stroke="#185FA5" stroke-width="1"/><text x="60" y="240" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="600" fill="#0C447C">x</text>
+
+  <circle cx="60" cy="400" r="24" fill="#FAEEDA" stroke="#854F0B" stroke-width="1"/><text x="60" y="400" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="600" fill="#633806">1</text>
+  <text x="60" y="434" text-anchor="middle" font-size="12" fill="#52514e">bias in</text>
+
+  <rect x="200" y="50" width="130" height="60" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
+  <text x="265" y="72" text-anchor="middle" font-size="14" font-weight="600" fill="#04342C">z1</text>
+  <text x="265" y="92" text-anchor="middle" font-size="12" fill="#0F6E56">w1&middot;x + b1</text>
+
+  <rect x="200" y="210" width="130" height="60" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
+  <text x="265" y="232" text-anchor="middle" font-size="14" font-weight="600" fill="#04342C">z2</text>
+  <text x="265" y="252" text-anchor="middle" font-size="12" fill="#0F6E56">w2&middot;x + b2</text>
+
+  <rect x="200" y="370" width="130" height="60" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
+  <text x="265" y="392" text-anchor="middle" font-size="14" font-weight="600" fill="#04342C">z3</text>
+  <text x="265" y="412" text-anchor="middle" font-size="12" fill="#0F6E56">w3&middot;x + b3</text>
+
+  <rect x="395" y="50" width="130" height="60" rx="8" fill="#EAF3DE" stroke="#3B6D11" stroke-width="1"/>
+  <text x="460" y="72" text-anchor="middle" font-size="14" font-weight="600" fill="#173404">a1</text>
+  <text x="460" y="92" text-anchor="middle" font-size="12" fill="#3B6D11">f(z1)</text>
+
+  <rect x="395" y="210" width="130" height="60" rx="8" fill="#EAF3DE" stroke="#3B6D11" stroke-width="1"/>
+  <text x="460" y="232" text-anchor="middle" font-size="14" font-weight="600" fill="#173404">a2</text>
+  <text x="460" y="252" text-anchor="middle" font-size="12" fill="#3B6D11">f(z2)</text>
+
+  <rect x="395" y="370" width="130" height="60" rx="8" fill="#EAF3DE" stroke="#3B6D11" stroke-width="1"/>
+  <text x="460" y="392" text-anchor="middle" font-size="14" font-weight="600" fill="#173404">a3</text>
+  <text x="460" y="412" text-anchor="middle" font-size="12" fill="#3B6D11">f(z3)</text>
+
+  <circle cx="650" cy="400" r="24" fill="#FAEEDA" stroke="#854F0B" stroke-width="1"/><text x="650" y="400" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="600" fill="#633806">1</text>
+  <text x="650" y="434" text-anchor="middle" font-size="12" fill="#52514e">bias out</text>
+
+  <circle cx="800" cy="240" r="32" fill="#EEEDFE" stroke="#534AB7" stroke-width="1"/><text x="800" y="240" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="600" fill="#3C3489">y</text>
+
+  <line x1="88" y1="228" x2="198" y2="90" stroke="#71706b" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <line x1="90" y1="240" x2="198" y2="240" stroke="#71706b" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <line x1="88" y1="252" x2="198" y2="395" stroke="#71706b" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <text x="120" y="150" font-size="12" fill="#52514e">w1</text>
+  <text x="120" y="238" font-size="12" fill="#52514e">w2</text>
+  <text x="120" y="330" font-size="12" fill="#52514e">w3</text>
+
+  <line x1="82" y1="388" x2="198" y2="102" stroke="#BA7517" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrowhead)"/>
+  <line x1="84" y1="398" x2="198" y2="260" stroke="#BA7517" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrowhead)"/>
+  <line x1="82" y1="408" x2="198" y2="420" stroke="#BA7517" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrowhead)"/>
+  <text x="140" y="200" font-size="12" fill="#854F0B">b1</text>
+  <text x="150" y="310" font-size="12" fill="#854F0B">b2</text>
+  <text x="140" y="435" font-size="12" fill="#854F0B">b3</text>
+
+  <line x1="332" y1="80" x2="393" y2="80" stroke="#71706b" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <line x1="332" y1="240" x2="393" y2="240" stroke="#71706b" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <line x1="332" y1="400" x2="393" y2="400" stroke="#71706b" stroke-width="1" marker-end="url(#arrowhead)"/>
+
+  <line x1="527" y1="72" x2="770" y2="225" stroke="#71706b" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <line x1="527" y1="240" x2="768" y2="240" stroke="#71706b" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <line x1="527" y1="398" x2="770" y2="257" stroke="#71706b" stroke-width="1" marker-end="url(#arrowhead)"/>
+  <text x="600" y="140" font-size="12" fill="#52514e">v1</text>
+  <text x="600" y="232" font-size="12" fill="#52514e">v2</text>
+  <text x="600" y="340" font-size="12" fill="#52514e">v3</text>
+
+  <line x1="672" y1="392" x2="775" y2="262" stroke="#BA7517" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrowhead)"/>
+  <text x="700" y="360" font-size="12" fill="#854F0B">b_out</text>
+
+  <text x="800" y="300" text-anchor="middle" font-size="12" fill="#52514e">y = b_out + &Sigma; v_k&middot;a_k</text>
+
+  <text x="20" y="475" font-size="12" fill="#898781">Solid = weights (w, v)   |   Dashed = biases (b, b_out)   |   Teal = fixed weighted sum   |   Green = the activation you pick</text>
+  </svg>
+</div>
+
+<div class="layout">
+
+  <div class="panel">
+    <h2>Network parameters (shared across all activations)</h2>
+
+    <div class="unit-block">
+      <p class="unit-title" style="color:var(--blue)">Hidden unit 1</p>
+      <div class="row"><span>w1</span><span class="val" id="v-w1">-1.00</span></div>
+      <input type="range" id="w1" min="-3" max="3" step="0.05" value="-1.0">
+      <div class="row"><span>b1</span><span class="val" id="v-b1">0.30</span></div>
+      <input type="range" id="b1" min="-3" max="3" step="0.05" value="0.3">
+      <div class="row"><span>v1 (output weight)</span><span class="val" id="v-v1">2.00</span></div>
+      <input type="range" id="v1" min="-8" max="8" step="0.1" value="2.0">
+    </div>
+
+    <div class="unit-block">
+      <p class="unit-title" style="color:var(--green)">Hidden unit 2</p>
+      <div class="row"><span>w2</span><span class="val" id="v-w2">2.00</span></div>
+      <input type="range" id="w2" min="-3" max="3" step="0.05" value="2.0">
+      <div class="row"><span>b2</span><span class="val" id="v-b2">-1.00</span></div>
+      <input type="range" id="b2" min="-3" max="3" step="0.05" value="-1.0">
+      <div class="row"><span>v2 (output weight)</span><span class="val" id="v-v2">-1.00</span></div>
+      <input type="range" id="v2" min="-8" max="8" step="0.1" value="-1.0">
+    </div>
+
+    <div class="unit-block">
+      <p class="unit-title" style="color:var(--amber)">Hidden unit 3</p>
+      <div class="row"><span>w3</span><span class="val" id="v-w3">0.65</span></div>
+      <input type="range" id="w3" min="-3" max="3" step="0.05" value="0.65">
+      <div class="row"><span>b3</span><span class="val" id="v-b3">-0.50</span></div>
+      <input type="range" id="b3" min="-3" max="3" step="0.05" value="-0.5">
+      <div class="row"><span>v3 (output weight)</span><span class="val" id="v-v3">7.00</span></div>
+      <input type="range" id="v3" min="-8" max="8" step="0.1" value="7.0">
+    </div>
+
+    <div class="unit-block" style="border-bottom:none;">
+      <p class="unit-title">Output bias</p>
+      <div class="row"><span>b_out</span><span class="val" id="v-bout">-0.30</span></div>
+      <input type="range" id="bout" min="-3" max="3" step="0.05" value="-0.3">
+    </div>
+
+    <button id="reset-btn">Reset to notebook defaults</button>
+  </div>
+
+  <div>
+    <div class="act-select" id="act-select">
+      <button class="act-btn active" data-fn="linear">Linear</button>
+      <button class="act-btn" data-fn="sigmoid">Sigmoid</button>
+      <button class="act-btn" data-fn="tanh">Tanh</button>
+      <button class="act-btn" data-fn="relu">ReLU</button>
+      <button class="act-btn" data-fn="leaky">Leaky ReLU</button>
+    </div>
+
+    <div class="top-row">
+      <div class="main-chart">
+        <h2>The activation function f(z)</h2>
+        <p class="formula" id="formula-text">f(z) = z</p>
+        <div class="chart-wrap"><canvas id="fzChart"></canvas></div>
+      </div>
+      <div class="main-chart">
+        <h2>Network output y(x)</h2>
+        <p class="formula">y = b_out + v1&middot;f(z1) + v2&middot;f(z2) + v3&middot;f(z3)</p>
+        <div class="chart-wrap"><canvas id="outputChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="cell">
+        <p class="cell-label">Pre-activations &nbsp;&middot;&nbsp; z_k = w_k&middot;x + b_k</p>
+        <div class="cell-chart"><canvas id="preChart"></canvas></div>
+      </div>
+      <div class="cell">
+        <p class="cell-label" id="act-label">Activations &nbsp;&middot;&nbsp; a_k = f(z_k)</p>
+        <div class="cell-chart"><canvas id="actChart"></canvas></div>
+      </div>
+      <div class="cell">
+        <p class="cell-label">Weighted activations &nbsp;&middot;&nbsp; v_k&middot;a_k</p>
+        <div class="cell-chart"><canvas id="wactChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-title">All activation functions, side by side</div>
+<div class="compare-grid">
+  <div class="compare-cell"><p class="cell-label" style="color:#000">Linear</p><div class="compare-cell-chart"><canvas id="cmp-linear"></canvas></div></div>
+  <div class="compare-cell"><p class="cell-label" style="color:var(--red)">Sigmoid</p><div class="compare-cell-chart"><canvas id="cmp-sigmoid"></canvas></div></div>
+  <div class="compare-cell"><p class="cell-label" style="color:var(--blue)">Tanh</p><div class="compare-cell-chart"><canvas id="cmp-tanh"></canvas></div></div>
+  <div class="compare-cell"><p class="cell-label" style="color:var(--green)">ReLU</p><div class="compare-cell-chart"><canvas id="cmp-relu"></canvas></div></div>
+  <div class="compare-cell"><p class="cell-label" style="color:var(--purple)">Leaky ReLU</p><div class="compare-cell-chart"><canvas id="cmp-leaky"></canvas></div></div>
+  <div class="compare-cell"><p class="cell-label" style="color:var(--orange)">Softmax (see below)</p><div class="compare-cell-chart"><canvas id="cmp-softmax"></canvas></div></div>
+</div>
+
+<div class="section-title">Softmax — turns a vector of scores into probabilities</div>
+<div class="panel softmax-panel">
+  <div>
+    <p class="row"><span>Cat score (z1)</span><span class="val" id="v-s1">2.00</span></p>
+    <input type="range" id="s1" min="-4" max="4" step="0.1" value="2.0">
+    <p class="row"><span>Dog score (z2)</span><span class="val" id="v-s2">1.00</span></p>
+    <input type="range" id="s2" min="-4" max="4" step="0.1" value="1.0">
+    <p class="row"><span>Bird score (z3)</span><span class="val" id="v-s3">0.10</span></p>
+    <input type="range" id="s3" min="-4" max="4" step="0.1" value="0.1">
+    <p style="font-size:12px; color:var(--text3); margin-top:14px;">Probabilities always sum to 1.0, no matter what the raw scores are.</p>
+  </div>
+  <div class="chart-wrap tall"><canvas id="softmaxChart"></canvas></div>
+</div>
+
+<script>
+(function(){
+  var ids=['w1','b1','v1','w2','b2','v2','w3','b3','v3','bout'];
+  var defaults={w1:-1.0,b1:0.3,v1:2.0,w2:2.0,b2:-1.0,v2:-1.0,w3:0.65,b3:-0.5,v3:7.0,bout:-0.3};
+  var els={}; ids.forEach(function(id){ els[id]=document.getElementById(id); });
+  var labelMap={w1:'v-w1',b1:'v-b1',v1:'v-v1',w2:'v-w2',b2:'v-b2',v2:'v-v2',w3:'v-w3',b3:'v-b3',v3:'v-v3',bout:'v-bout'};
+
+  var formulas={
+    linear:'f(z) = z',
+    sigmoid:'f(z) = 1 / (1 + e^-z)',
+    tanh:'f(z) = tanh(z)',
+    relu:'f(z) = max(0, z)',
+    leaky:'f(z) = z if z>=0 else 0.01*z'
+  };
+  var actLabels={
+    linear:'Activations · a_k = z_k (linear)',
+    sigmoid:'Activations · a_k = sigmoid(z_k)',
+    tanh:'Activations · a_k = tanh(z_k)',
+    relu:'Activations · a_k = ReLU(z_k)',
+    leaky:'Activations · a_k = LeakyReLU(z_k)'
+  };
+
+  var fns={
+    linear:function(z){ return z; },
+    sigmoid:function(z){ return 1/(1+Math.exp(-z)); },
+    tanh:function(z){ return Math.tanh(z); },
+    relu:function(z){ return Math.max(0,z); },
+    leaky:function(z){ return z>=0? z : 0.01*z; }
+  };
+
+  var currentFn='linear';
+
+  var xNet=[]; for(var i=-200;i<=200;i++){ xNet.push(i*0.01); }
+  var zRange=[]; for(var j=-60;j<=60;j++){ zRange.push(j*0.1); }
+
+  function xy(xs,ys){ return xs.map(function(x,i){ return {x:x,y:ys[i]}; }); }
+
+  function lineDs(color,dash){ return {type:'line', data:[], borderColor:color, borderWidth:2, pointRadius:0, tension:0, borderDash: dash||[]}; }
+
+  function baseOpts(xmin,xmax,legend){
+    return {
+      responsive:true, maintainAspectRatio:false, animation:false,
+      scales:{
+        x:{type:'linear', min:xmin, max:xmax, ticks:{color:'#898781', font:{size:9}}, grid:{color:'#e1e0d9'}},
+        y:{ticks:{color:'#898781', font:{size:9}}, grid:{color:'#e1e0d9'}}
+      },
+      plugins:{legend:{display:!!legend, labels:{color:'#52514e', usePointStyle:true, boxWidth:8, font:{size:10}}}}
+    };
+  }
+
+  var fzChart=new Chart(document.getElementById('fzChart'),{
+    data:{ datasets:[ lineDs('#2a78d6') ] },
+    options: baseOpts(-6,6,false)
+  });
+
+  var preChart=new Chart(document.getElementById('preChart'),{
+    data:{ datasets:[ lineDs('#2a78d6'), lineDs('#1baf7a'), lineDs('#eda100') ] },
+    options: baseOpts(-2,2,true)
+  });
+  var actChart=new Chart(document.getElementById('actChart'),{
+    data:{ datasets:[ lineDs('#2a78d6'), lineDs('#1baf7a'), lineDs('#eda100') ] },
+    options: baseOpts(-2,2,true)
+  });
+  var wactChart=new Chart(document.getElementById('wactChart'),{
+    data:{ datasets:[ lineDs('#2a78d6'), lineDs('#1baf7a'), lineDs('#eda100') ] },
+    options: baseOpts(-2,2,true)
+  });
+  var outputChart=new Chart(document.getElementById('outputChart'),{
+    data:{ datasets:[ {type:'line', data:[], borderColor:'#0b0b0b', borderWidth:2.5, pointRadius:0, tension:0} ] },
+    options: baseOpts(-2,2,false)
+  });
+
+  function readParams(){
+    var p={};
+    ids.forEach(function(id){ p[id]=parseFloat(els[id].value); });
+    return p;
+  }
+
+  function updateNetwork(){
+    var p=readParams();
+    ids.forEach(function(id){ document.getElementById(labelMap[id]).textContent=p[id].toFixed(2); });
+
+    var f=fns[currentFn];
+    document.getElementById('formula-text').textContent=formulas[currentFn];
+    document.getElementById('act-label').textContent=actLabels[currentFn];
+
+    fzChart.data.datasets[0].data=xy(zRange, zRange.map(f));
+    fzChart.update('none');
+
+    var z1=[],z2=[],z3=[],a1=[],a2=[],a3=[],wa1=[],wa2=[],wa3=[],y=[];
+    xNet.forEach(function(x){
+      var zz1=p.w1*x+p.b1, zz2=p.w2*x+p.b2, zz3=p.w3*x+p.b3;
+      var aa1=f(zz1), aa2=f(zz2), aa3=f(zz3);
+      var ww1=p.v1*aa1, ww2=p.v2*aa2, ww3=p.v3*aa3;
+      z1.push(zz1); z2.push(zz2); z3.push(zz3);
+      a1.push(aa1); a2.push(aa2); a3.push(aa3);
+      wa1.push(ww1); wa2.push(ww2); wa3.push(ww3);
+      y.push(p.bout+ww1+ww2+ww3);
+    });
+
+    preChart.data.datasets[0].data=xy(xNet,z1);
+    preChart.data.datasets[1].data=xy(xNet,z2);
+    preChart.data.datasets[2].data=xy(xNet,z3);
+    preChart.update('none');
+
+    actChart.data.datasets[0].data=xy(xNet,a1);
+    actChart.data.datasets[1].data=xy(xNet,a2);
+    actChart.data.datasets[2].data=xy(xNet,a3);
+    actChart.update('none');
+
+    wactChart.data.datasets[0].data=xy(xNet,wa1);
+    wactChart.data.datasets[1].data=xy(xNet,wa2);
+    wactChart.data.datasets[2].data=xy(xNet,wa3);
+    wactChart.update('none');
+
+    outputChart.data.datasets[0].data=xy(xNet,y);
+    outputChart.update('none');
+  }
+
+  ids.forEach(function(id){ els[id].addEventListener('input', updateNetwork); });
+  document.getElementById('reset-btn').addEventListener('click', function(){
+    ids.forEach(function(id){ els[id].value=defaults[id]; });
+    updateNetwork();
+  });
+
+  document.querySelectorAll('.act-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.act-btn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      currentFn=btn.dataset.fn;
+      updateNetwork();
+    });
+  });
+
+  updateNetwork();
+
+  function miniCompareChart(id,color,fn,dash){
+    var c=new Chart(document.getElementById(id),{
+      data:{ datasets:[ {type:'line', data:xy(zRange, zRange.map(fn)), borderColor:color, borderWidth:2, pointRadius:0, tension:0, borderDash:dash||[]} ] },
+      options: baseOpts(-6,6,false)
+    });
+    return c;
+  }
+  miniCompareChart('cmp-linear','#0b0b0b',fns.linear);
+  miniCompareChart('cmp-sigmoid','#e34948',fns.sigmoid);
+  miniCompareChart('cmp-tanh','#2a78d6',fns.tanh);
+  miniCompareChart('cmp-relu','#1baf7a',fns.relu);
+  miniCompareChart('cmp-leaky','#4a3aa7',fns.leaky);
+
+  var softmaxCompare=new Chart(document.getElementById('cmp-softmax'),{
+    type:'bar',
+    data:{ labels:['Cat','Dog','Bird'], datasets:[{ data:[0.66,0.24,0.10], backgroundColor:['#eb6834','#2a78d6','#1baf7a'] }] },
+    options:{
+      responsive:true, maintainAspectRatio:false, animation:false,
+      scales:{ y:{min:0,max:1, ticks:{color:'#898781', font:{size:9}}, grid:{color:'#e1e0d9'}}, x:{ticks:{color:'#898781', font:{size:9}}, grid:{display:false}} },
+      plugins:{legend:{display:false}}
+    }
+  });
+
+  var softmaxChart=new Chart(document.getElementById('softmaxChart'),{
+    type:'bar',
+    data:{ labels:['Cat','Dog','Bird'], datasets:[{ data:[0,0,0], backgroundColor:['#eb6834','#2a78d6','#1baf7a'] }] },
+    options:{
+      responsive:true, maintainAspectRatio:false, animation:false,
+      scales:{ y:{min:0,max:1, ticks:{color:'#898781'}, grid:{color:'#e1e0d9'}}, x:{ticks:{color:'#52514e', font:{size:13}}, grid:{display:false}} },
+      plugins:{legend:{display:false}}
+    }
+  });
+
+  function updateSoftmax(){
+    var s1=parseFloat(document.getElementById('s1').value);
+    var s2=parseFloat(document.getElementById('s2').value);
+    var s3=parseFloat(document.getElementById('s3').value);
+    document.getElementById('v-s1').textContent=s1.toFixed(2);
+    document.getElementById('v-s2').textContent=s2.toFixed(2);
+    document.getElementById('v-s3').textContent=s3.toFixed(2);
+
+    var scores=[s1,s2,s3];
+    var maxS=Math.max.apply(null,scores);
+    var exps=scores.map(function(s){ return Math.exp(s-maxS); });
+    var sumE=exps.reduce(function(a,b){ return a+b; },0);
+    var probs=exps.map(function(e){ return e/sumE; });
+
+    softmaxChart.data.datasets[0].data=probs;
+    softmaxChart.update('none');
+    softmaxCompare.data.datasets[0].data=probs;
+    softmaxCompare.update('none');
+  }
+  ['s1','s2','s3'].forEach(function(id){
+    document.getElementById(id).addEventListener('input', updateSoftmax);
+  });
+  updateSoftmax();
+})();
+</script>
+</body>
+</html>
