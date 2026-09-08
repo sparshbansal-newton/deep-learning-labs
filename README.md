@@ -30,6 +30,8 @@ per-notebook Colab links is in [`Notebooks/README.md`](Notebooks/README.md).
 | [`6_Auto_grad`](Notebooks/6_Auto_grad) | The computational graph and `.backward()` |
 | [`7_pytorch_training_pipeline`](Notebooks/7_pytorch_training_pipeline) | A full training loop with `nn.Module` |
 | [`8_Gradient_Descent_Types`](Notebooks/8_Gradient_Descent_Types) | Batch, stochastic and mini-batch compared |
+| [`9_Optimizers`](Notebooks/9_Optimizers) | SGD, momentum, NAG, AdaGrad, RMSProp and Adam compared |
+| [`10_Dataset_DataLoader`](Notebooks/10_Dataset_DataLoader) | `Dataset` and `DataLoader` built and traced on a toy set |
 
 Outputs are kept in the committed notebooks, so plots and printed results render
 on GitHub without running anything.

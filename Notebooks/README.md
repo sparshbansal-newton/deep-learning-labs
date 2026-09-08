@@ -75,6 +75,12 @@ through to the end before opening the answers.
 |---|---|---|
 | [`Optimizers.ipynb`](9_Optimizers/Optimizers.ipynb) | [<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab">](https://colab.research.google.com/github/sparshbansal-newton/deep-learning-labs/blob/main/Notebooks/9_Optimizers/Optimizers.ipynb) | Six optimizers run on the same ill-conditioned ravine — SGD, momentum, NAG, AdaGrad, RMSProp and Adam — with trajectories and loss curves compared side by side. |
 
+## Datasets and DataLoaders
+
+| Notebook | | Contents |
+|---|---|---|
+| [`Dataset_DataLoader.ipynb`](10_Dataset_DataLoader/Dataset_DataLoader.ipynb) | [<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab">](https://colab.research.google.com/github/sparshbansal-newton/deep-learning-labs/blob/main/Notebooks/10_Dataset_DataLoader/Dataset_DataLoader.ipynb) | A custom `Dataset` written from its three methods and served by a `DataLoader`, on ten samples small enough to check every batch by eye. |
+
 Folder `3_Activation_Functions` also holds [`activation_functions_Visualization.html`](3_Activation_Functions/activation_functions_Visualization.html), a standalone page that plots each activation and its derivative.
 
 ---
