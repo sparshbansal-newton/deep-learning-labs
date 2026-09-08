@@ -69,6 +69,12 @@ through to the end before opening the answers.
 |---|---|---|
 | [`Gradient_Descent_Types.ipynb`](8_Gradient_Descent_Types/Gradient_Descent_Types.ipynb) | [<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab">](https://colab.research.google.com/github/sparshbansal-newton/deep-learning-labs/blob/main/Notebooks/8_Gradient_Descent_Types/Gradient_Descent_Types.ipynb) | The same network trained three times, changing only `batch_size` — batch, stochastic and mini-batch compared. |
 
+## Optimizers
+
+| Notebook | | Contents |
+|---|---|---|
+| [`Optimizers.ipynb`](9_Optimizers/Optimizers.ipynb) | [<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab">](https://colab.research.google.com/github/sparshbansal-newton/deep-learning-labs/blob/main/Notebooks/9_Optimizers/Optimizers.ipynb) | Six optimizers run on the same ill-conditioned ravine — SGD, momentum, NAG, AdaGrad, RMSProp and Adam — with trajectories and loss curves compared side by side. |
+
 Folder `3_Activation_Functions` also holds [`activation_functions_Visualization.html`](3_Activation_Functions/activation_functions_Visualization.html), a standalone page that plots each activation and its derivative.
 
 ---
