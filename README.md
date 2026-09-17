@@ -32,6 +32,7 @@ per-notebook Colab links is in [`Notebooks/README.md`](Notebooks/README.md).
 | [`08_Gradient_Descent_Types`](Notebooks/08_Gradient_Descent_Types) | Batch, stochastic and mini-batch compared |
 | [`09_Optimizers`](Notebooks/09_Optimizers) | SGD, momentum, NAG, AdaGrad, RMSProp and Adam compared |
 | [`10_Dataset_DataLoader`](Notebooks/10_Dataset_DataLoader) | `Dataset` and `DataLoader` built and traced on a toy set |
+| [`11_Regularization`](Notebooks/11_Regularization) | L2 weight decay, then Dropout and BatchNorm, against overfitting |
 
 Outputs are kept in the committed notebooks, so plots and printed results render
 on GitHub without running anything.

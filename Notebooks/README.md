@@ -81,6 +81,12 @@ through to the end before opening the answers.
 |---|---|---|
 | [`Dataset_DataLoader.ipynb`](10_Dataset_DataLoader/Dataset_DataLoader.ipynb) | [<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab">](https://colab.research.google.com/github/sparshbansal-newton/deep-learning-labs/blob/main/Notebooks/10_Dataset_DataLoader/Dataset_DataLoader.ipynb) | A custom `Dataset` written from its three methods and served by a `DataLoader`, on ten samples small enough to check every batch by eye. |
 
+## Regularization
+
+| Notebook | | Contents |
+|---|---|---|
+| [`ANN_Regularization.ipynb`](11_Regularization/ANN_Regularization.ipynb) | [<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab">](https://colab.research.google.com/github/sparshbansal-newton/deep-learning-labs/blob/main/Notebooks/11_Regularization/ANN_Regularization.ipynb) | An overfitting `MyNN` fixed in two steps — L2 weight decay in the optimizer, then Dropout and BatchNorm inside the model — with the train/test gap compared at each step. |
+
 Folder `03_Activation_Functions` also holds [`activation_functions_Visualization.html`](03_Activation_Functions/activation_functions_Visualization.html), a standalone page that plots each activation and its derivative.
 
 ---
