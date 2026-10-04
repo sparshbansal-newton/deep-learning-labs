@@ -87,6 +87,12 @@ through to the end before opening the answers.
 |---|---|---|
 | [`ANN_Regularization.ipynb`](11_Regularization/ANN_Regularization.ipynb) | [<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab">](https://colab.research.google.com/github/sparshbansal-newton/deep-learning-labs/blob/main/Notebooks/11_Regularization/ANN_Regularization.ipynb) | An overfitting `MyNN` fixed in two steps — L2 weight decay in the optimizer, then Dropout and BatchNorm inside the model — with the train/test gap compared at each step. |
 
+## Convolutional Neural Networks
+
+| Notebook | | Contents |
+|---|---|---|
+| [`CNN_CIFAR10_Classification.ipynb`](12_CNN/CNN_CIFAR10_Classification.ipynb) | [<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab">](https://colab.research.google.com/github/sparshbansal-newton/deep-learning-labs/blob/main/Notebooks/12_CNN/CNN_CIFAR10_Classification.ipynb) | A two-block CNN trained on CIFAR-10, then rebuilt with BatchNorm and Dropout, with train and test accuracy compared to show the overfitting gap closing. |
+
 Folder `03_Activation_Functions` also holds [`activation_functions_Visualization.html`](03_Activation_Functions/activation_functions_Visualization.html), a standalone page that plots each activation and its derivative.
 
 ---
