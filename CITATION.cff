@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this material, please cite it as below."
+title: "Deep Learning 2026 — Laboratory Materials"
+type: software
+authors:
+  - given-names: Sparsh
+    family-names: Bansal
+abstract: >-
+  Laboratory materials for the Deep Learning 2026 course: Jupyter notebooks
+  (Google Colab) and interactive browser pages covering PyTorch fundamentals,
+  optimisation, data pipelines, regularisation and convolutional neural
+  network architectures.
+keywords:
+  - deep learning
+  - pytorch
+  - convolutional neural networks
+  - course materials
+license: CC-BY-4.0
+repository-code: "https://github.com/sparshbansal-newton/deep-learning-labs"
+url: "https://sparshbansal-newton.github.io/deep-learning-labs/"
+date-released: "2026-10-04"

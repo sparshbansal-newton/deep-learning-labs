@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Deep Learning: Interactive Labs</title>
-<meta name="description" content="Interactive, self-contained labs for a deep learning course: gradient descent regimes and the PyTorch data pipeline.">
+<title>Deep Learning 2026: Laboratory Materials</title>
+<meta name="description" content="Laboratory materials for the Deep Learning 2026 course: Colab notebooks and interactive pages, from PyTorch tensors to CNN architectures.">
 <style>
 :root{
   --ink:#0F2440; --blue:#1B3C69; --blue-2:#3F6394; --amber:#C67C11; --plum:#6D2E46;
@@ -55,6 +55,10 @@ a.card:hover h3{color:var(--blue)}
 .card p.covers{margin:11px 0 0;font-family:var(--mono);font-size:12.5px;color:var(--lgrey);
   letter-spacing:.02em;line-height:1.45}
 
+h3.unit{font-family:var(--serif);font-size:19px;font-weight:700;color:var(--ink);margin:30px 0 12px;line-height:1.3}
+h3.unit span{display:inline-block;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--amber);margin-right:10px;vertical-align:2px}
+h2.sec+p.note+h3.unit{margin-top:0}
 footer{margin-top:42px;padding-top:20px;border-top:1px solid var(--rule);font-size:14.5px;color:var(--lgrey)}
 footer a{color:var(--blue)}
 
@@ -70,14 +74,14 @@ footer a{color:var(--blue)}
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">Deep Learning</p>
-  <h1>Interactive Labs</h1>
-  <p class="lede">Laboratory exercises for the Deep Learning course. Each lab treats one topic in full — the rule is stated, applied to a worked example, then implemented in code — on a single self-contained page.</p>
+  <p class="eyebrow">Deep Learning 2026</p>
+  <h1>Laboratory Materials</h1>
+  <p class="lede">Laboratory material for the Deep Learning 2026 course, organised into four units and numbered by topic in teaching order. Each topic is a Jupyter notebook that opens in Colab; selected topics also have an interactive companion page that runs in the browser.</p>
 </header>
 
-<p class="note"><b>How to use these:</b> every page runs entirely in your browser. Work each quantity out by hand first, then adjust the controls and check your result against the value the page computes.</p>
+<p class="note"><b>How to use these:</b> the interactive pages run entirely in your browser — work each quantity out by hand first, then adjust the controls and check your result against the value the page computes. The notebooks open in Colab, where you run and modify the code yourself.</p>
 
-<h2 class="sec">The labs</h2>
+<h2 class="sec">Interactive labs</h2>
 
 <!-- ==================================================================
      ADDING AN ENTRY
@@ -96,14 +100,14 @@ footer a{color:var(--blue)}
 <ol class="list">
 
   <li><a class="card" href="gradient-descent-lab.html">
-    <span class="tag lab">Lab 06</span>
+    <span class="tag lab">Topic 08 · Interactive</span>
     <h3>Gradient Descent and Its Types</h3>
     <p>Batch, stochastic and mini-batch gradient descent compared in PyTorch on a purchase-prediction dataset. The update rule is developed first, then traced through a complete training loop, with the loss curve of each regime recorded and read against the theory.</p>
     <p class="covers">batch GD · stochastic GD · mini-batch · loss curves · optimisation path · vectorisation vs. memory</p>
   </a></li>
 
   <li><a class="card" href="dataset-dataloader-lab.html">
-    <span class="tag lab">Lab 07</span>
+    <span class="tag lab">Topic 10 · Interactive</span>
     <h3>Datasets and DataLoaders in PyTorch</h3>
     <p>Why a full dataset cannot be passed to the model in one step, and how the two abstractions divide the work. A <code>Dataset</code> is built from its three required methods, then a <code>DataLoader</code> is configured around it.</p>
     <p class="covers">Dataset · DataLoader · transforms · samplers · collate_fn · num_workers</p>
@@ -111,101 +115,117 @@ footer a{color:var(--blue)}
 
 </ol>
 
-<h2 class="sec">The notebooks</h2>
+<h2 class="sec">Lab notebooks</h2>
 
 <p class="note"><b>These run in Colab, not here:</b> each folder holds Jupyter
 notebooks with a one-click <b>Open in Colab</b> badge at the top. Outputs are kept in
 the files, so you can read every plot and result on GitHub before running anything.
 Full index: <a href="https://github.com/sparshbansal-newton/deep-learning-labs/tree/main/Notebooks">Notebooks/</a>.</p>
 
+<h3 class="unit"><span>Unit I</span>Foundations of PyTorch and Neural Networks</h3>
 <ol class="list">
 
   <li><a class="card" href="https://github.com/sparshbansal-newton/deep-learning-labs/tree/main/Notebooks/01_Intro_to_pytorch">
-    <span class="tag notes">Notebook 01</span>
+    <span class="tag notes">Topic 01 · Notebook</span>
     <h3>Introduction to PyTorch</h3>
     <p>Where PyTorch came from and how it is put together, then tensors worked through from first principles. Ships with a completed answer notebook.</p>
     <p class="covers">torch history · tensors · dtypes · indexing · broadcasting</p>
   </a></li>
 
   <li><a class="card" href="https://github.com/sparshbansal-newton/deep-learning-labs/tree/main/Notebooks/02_Shallow_neural_networks">
-    <span class="tag notes">Notebook 02</span>
+    <span class="tag notes">Topic 02 · Notebook</span>
     <h3>Shallow Neural Networks</h3>
     <p>A single neuron always draws a straight line, so it cannot solve XOR — the argument for hidden layers, followed by shallow networks on 1D inputs.</p>
     <p class="covers">XOR · decision boundary · hidden units · 1D inputs</p>
   </a></li>
 
   <li><a class="card" href="https://github.com/sparshbansal-newton/deep-learning-labs/tree/main/Notebooks/03_Activation_Functions">
-    <span class="tag notes">Notebook 03</span>
+    <span class="tag notes">Topic 03 · Notebook</span>
     <h3>Activation Functions</h3>
     <p>One tiny 1&rarr;3&rarr;1 network with a different activation plugged in each time, so every change in the output is attributable to the activation alone.</p>
     <p class="covers">ReLU · sigmoid · tanh · forward prop · loss</p>
   </a></li>
 
   <li><a class="card" href="https://github.com/sparshbansal-newton/deep-learning-labs/tree/main/Notebooks/04_pytorch_forward_prop">
-    <span class="tag notes">Notebook 04</span>
+    <span class="tag notes">Topic 04 · Notebook</span>
     <h3>Forward Propagation in PyTorch</h3>
     <p>The forward pass and its loss built by hand on the Bank Customer Churn dataset. Student notebook with blanks, plus the answer key.</p>
     <p class="covers">manual forward pass · weights · bias · BCE loss</p>
   </a></li>
 
   <li><a class="card" href="https://github.com/sparshbansal-newton/deep-learning-labs/tree/main/Notebooks/05_Loss_Functions">
-    <span class="tag notes">Notebook 05</span>
+    <span class="tag notes">Topic 05 · Notebook</span>
     <h3>Loss Functions</h3>
     <p>Three losses implemented from their definitions and checked against PyTorch, with the rule for choosing between them stated and applied.</p>
     <p class="covers">MSE · MAE · BCE · cross-entropy · reduction</p>
   </a></li>
 
   <li><a class="card" href="https://github.com/sparshbansal-newton/deep-learning-labs/tree/main/Notebooks/06_Auto_grad">
-    <span class="tag notes">Notebook 06</span>
+    <span class="tag notes">Topic 06 · Notebook</span>
     <h3>Autograd</h3>
     <p>Why hand-differentiation does not scale, then the computational graph that replaces it: recorded operations walked backward by the chain rule.</p>
     <p class="covers">requires_grad · computational graph · .backward() · chain rule</p>
   </a></li>
 
   <li><a class="card" href="https://github.com/sparshbansal-newton/deep-learning-labs/tree/main/Notebooks/07_pytorch_training_pipeline">
-    <span class="tag notes">Notebook 07</span>
+    <span class="tag notes">Topic 07 · Notebook</span>
     <h3>Training Pipeline</h3>
     <p>A binary classifier assembled from PyTorch's core building blocks, then the same loop rewritten around <code>nn.Module</code>.</p>
     <p class="covers">training loop · nn.Module · optimiser · zero_grad · evaluation</p>
   </a></li>
 
+</ol>
+
+<h3 class="unit"><span>Unit II</span>Optimisation and Data Pipelines</h3>
+<ol class="list">
+
   <li><a class="card" href="https://github.com/sparshbansal-newton/deep-learning-labs/tree/main/Notebooks/08_Gradient_Descent_Types">
-    <span class="tag notes">Notebook 08</span>
+    <span class="tag notes">Topic 08 · Notebook</span>
     <h3>Gradient Descent and Its Types</h3>
     <p>The same network trained three times, changing only <code>batch_size</code>, with the loss curve of each regime recorded and read against the theory.</p>
     <p class="covers">batch GD · stochastic GD · mini-batch · loss curves</p>
   </a></li>
 
   <li><a class="card" href="https://github.com/sparshbansal-newton/deep-learning-labs/tree/main/Notebooks/09_Optimizers">
-    <span class="tag notes">Notebook 09</span>
+    <span class="tag notes">Topic 09 · Notebook</span>
     <h3>Optimizers</h3>
     <p>Six optimizers run on one ill-conditioned ravine, each answering the failure of the one before it, with every trajectory and loss curve read off the same surface.</p>
     <p class="covers">SGD · momentum · NAG · AdaGrad · RMSProp · Adam</p>
   </a></li>
 
   <li><a class="card" href="https://github.com/sparshbansal-newton/deep-learning-labs/tree/main/Notebooks/10_Dataset_DataLoader">
-    <span class="tag notes">Notebook 10</span>
+    <span class="tag notes">Topic 10 · Notebook</span>
     <h3>Datasets and DataLoaders</h3>
     <p>A custom <code>Dataset</code> written from its three methods and served by a <code>DataLoader</code>, on ten samples small enough to check every batch by eye.</p>
     <p class="covers">__len__ · __getitem__ · batching · shuffling · collate</p>
   </a></li>
 
+</ol>
+
+<h3 class="unit"><span>Unit III</span>Regularisation</h3>
+<ol class="list">
+
   <li><a class="card" href="https://github.com/sparshbansal-newton/deep-learning-labs/tree/main/Notebooks/11_Regularization">
-    <span class="tag notes">Notebook 11</span>
+    <span class="tag notes">Topic 11 · Notebook</span>
     <h3>Regularization</h3>
     <p>An overfitting network fixed in two steps — L2 weight decay in the optimizer, then Dropout and BatchNorm inside the model — with the train/test gap read after each one.</p>
     <p class="covers">overfitting · L2 / weight decay · Dropout · BatchNorm</p>
   </a></li>
 
+</ol>
+
+<h3 class="unit"><span>Unit IV</span>Convolutional Neural Networks</h3>
+<ol class="list">
+
   <li><a class="card" href="https://github.com/sparshbansal-newton/deep-learning-labs/tree/main/Notebooks/12_CNN">
-    <span class="tag notes">Notebook 12</span>
+    <span class="tag notes">Topic 12 · Notebook</span>
     <h3>Convolutional Neural Networks</h3>
     <p>A two-block CNN trained on CIFAR-10, then rebuilt with BatchNorm and Dropout, with train and test accuracy compared to show the overfitting gap closing.</p>
     <p class="covers">Conv2d · MaxPool2d · output shapes · BatchNorm2d · Dropout · CIFAR-10</p>
   </a></li>
 
   <li><a class="card" href="https://github.com/sparshbansal-newton/deep-learning-labs/tree/main/Notebooks/13_CNN_Architectures">
-    <span class="tag notes">Notebook 13</span>
+    <span class="tag notes">Topic 13 · Notebook</span>
     <h3>CNN Architectures</h3>
     <p>A baseline CNN, AlexNet, a VGG-style network and ResNet-18 trained with one shared function — parameters move from the FC head into the conv layers as test accuracy climbs from 72% to 83%.</p>
     <p class="covers">AlexNet · VGG · ResNet · skip connections · global average pooling</p>
@@ -214,7 +234,7 @@ Full index: <a href="https://github.com/sparshbansal-newton/deep-learning-labs/t
 </ol>
 
 <footer>
-  <p>Built for classroom use. Source on <a href="https://github.com/sparshbansal-newton/deep-learning-labs">GitHub</a>. Corrections welcome.</p>
+  <p>Built for classroom use. Source on <a href="https://github.com/sparshbansal-newton/deep-learning-labs">GitHub</a>, where <b>Cite this repository</b> gives a citation. Licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Corrections welcome.</p>
 </footer>
 
 </div>
