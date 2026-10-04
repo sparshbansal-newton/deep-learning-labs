@@ -33,6 +33,8 @@ per-notebook Colab links is in [`Notebooks/README.md`](Notebooks/README.md).
 | [`09_Optimizers`](Notebooks/09_Optimizers) | SGD, momentum, NAG, AdaGrad, RMSProp and Adam compared |
 | [`10_Dataset_DataLoader`](Notebooks/10_Dataset_DataLoader) | `Dataset` and `DataLoader` built and traced on a toy set |
 | [`11_Regularization`](Notebooks/11_Regularization) | L2 weight decay, then Dropout and BatchNorm, against overfitting |
+| [`12_CNN`](Notebooks/12_CNN) | A CNN on CIFAR-10, then BatchNorm and Dropout to close the overfitting gap |
+| [`13_CNN_Architectures`](Notebooks/13_CNN_Architectures) | CNN, AlexNet, VGG and ResNet-18 compared on CIFAR-10 |
 
 Outputs are kept in the committed notebooks, so plots and printed results render
 on GitHub without running anything.
