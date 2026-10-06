@@ -25,9 +25,9 @@ header{border-bottom:2px solid var(--ink);padding-bottom:22px;margin-bottom:32px
 h1{font-family:var(--serif);font-weight:700;font-size:38px;line-height:1.15;margin:0 0 12px;letter-spacing:-.01em}
 .lede{font-family:var(--serif);font-size:19px;color:var(--grey);margin:0;max-width:62ch;line-height:1.5}
 
-.note{background:var(--cream);border:1px solid var(--creamb);border-left:4px solid var(--amber);
-  border-radius:0 var(--r) var(--r) 0;padding:14px 17px;margin:0 0 32px;font-size:15.5px;color:#5A4420}
-.note b{color:#4A3616}
+.usage-notes{max-width:72ch;font-size:13px;line-height:1.5;color:var(--grey);margin-bottom:18px}
+.usage-notes p{margin:0 0 8px}
+.usage-notes p:last-child{margin-bottom:0}
 
 h2.sec{font-size:12.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--lgrey);font-weight:700;
   margin:0 0 16px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
@@ -58,7 +58,7 @@ a.card:hover h3{color:var(--blue)}
 h3.unit{font-family:var(--serif);font-size:19px;font-weight:700;color:var(--ink);margin:30px 0 12px;line-height:1.3}
 h3.unit span{display:inline-block;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
   color:var(--amber);margin-right:10px;vertical-align:2px}
-h2.sec+p.note+h3.unit{margin-top:0}
+h2.sec+h3.unit{margin-top:0}
 footer{margin-top:42px;padding-top:20px;border-top:1px solid var(--rule);font-size:14.5px;color:var(--lgrey)}
 footer a{color:var(--blue)}
 
@@ -79,14 +79,7 @@ footer a{color:var(--blue)}
   <p class="lede">Laboratory material for the Deep Learning 2026 course, organised into four units and numbered by topic in teaching order. Each topic is a Jupyter notebook that opens in Colab; selected topics also have an interactive companion page that runs in the browser.</p>
 </header>
 
-<p class="note"><b>How to use these:</b> the interactive pages run entirely in your browser — work each quantity out by hand first, then adjust the controls and check your result against the value the page computes. The notebooks open in Colab, where you run and modify the code yourself.</p>
-
 <h2 class="sec">Lab notebooks</h2>
-
-<p class="note"><b>These run in Colab, not here:</b> each folder holds Jupyter
-notebooks with a one-click <b>Open in Colab</b> badge at the top. Outputs are kept in
-the files, so you can read every plot and result on GitHub before running anything.
-Full index: <a href="https://github.com/sparshbansal-newton/deep-learning-labs/tree/main/Notebooks">Notebooks/</a>.</p>
 
 <h3 class="unit"><span>Unit I</span>Foundations of PyTorch and Neural Networks</h3>
 <ol class="list">
@@ -234,6 +227,13 @@ Full index: <a href="https://github.com/sparshbansal-newton/deep-learning-labs/t
 </ol>
 
 <footer>
+  <aside class="usage-notes" aria-label="Usage guidance">
+    <p><b>How to use these:</b> the interactive pages run entirely in your browser — work each quantity out by hand first, then adjust the controls and check your result against the value the page computes. The notebooks open in Colab, where you run and modify the code yourself.</p>
+    <p><b>These run in Colab, not here:</b> each folder holds Jupyter
+notebooks with a one-click <b>Open in Colab</b> badge at the top. Outputs are kept in
+the files, so you can read every plot and result on GitHub before running anything.
+Full index: <a href="https://github.com/sparshbansal-newton/deep-learning-labs/tree/main/Notebooks">Notebooks/</a>.</p>
+  </aside>
   <p>Built for classroom use. Source on <a href="https://github.com/sparshbansal-newton/deep-learning-labs">GitHub</a>, where <b>Cite this repository</b> gives a citation. Licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Corrections welcome.</p>
 </footer>
 
