@@ -81,40 +81,6 @@ footer a{color:var(--blue)}
 
 <p class="note"><b>How to use these:</b> the interactive pages run entirely in your browser — work each quantity out by hand first, then adjust the controls and check your result against the value the page computes. The notebooks open in Colab, where you run and modify the code yourself.</p>
 
-<h2 class="sec">Interactive labs</h2>
-
-<!-- ==================================================================
-     ADDING AN ENTRY
-     Copy one <li> block below, place it anywhere in this list, and edit
-     the five marked fields. Nothing outside the block needs to change.
-     The tag class is either "lab" (blue) or "notes" (plum).
-
-     <li><a class="card" href="FILENAME.html">
-       <span class="tag lab">LABEL</span>
-       <h3>TITLE</h3>
-       <p>ONE-SENTENCE SUMMARY</p>
-       <p class="covers">topic · topic · topic</p>
-     </a></li>
-     ================================================================== -->
-
-<ol class="list">
-
-  <li><a class="card" href="gradient-descent-lab.html">
-    <span class="tag lab">Topic 08 · Interactive</span>
-    <h3>Gradient Descent and Its Types</h3>
-    <p>Batch, stochastic and mini-batch gradient descent compared in PyTorch on a purchase-prediction dataset. The update rule is developed first, then traced through a complete training loop, with the loss curve of each regime recorded and read against the theory.</p>
-    <p class="covers">batch GD · stochastic GD · mini-batch · loss curves · optimisation path · vectorisation vs. memory</p>
-  </a></li>
-
-  <li><a class="card" href="dataset-dataloader-lab.html">
-    <span class="tag lab">Topic 10 · Interactive</span>
-    <h3>Datasets and DataLoaders in PyTorch</h3>
-    <p>Why a full dataset cannot be passed to the model in one step, and how the two abstractions divide the work. A <code>Dataset</code> is built from its three required methods, then a <code>DataLoader</code> is configured around it.</p>
-    <p class="covers">Dataset · DataLoader · transforms · samplers · collate_fn · num_workers</p>
-  </a></li>
-
-</ol>
-
 <h2 class="sec">Lab notebooks</h2>
 
 <p class="note"><b>These run in Colab, not here:</b> each folder holds Jupyter
@@ -229,6 +195,40 @@ Full index: <a href="https://github.com/sparshbansal-newton/deep-learning-labs/t
     <h3>CNN Architectures</h3>
     <p>A baseline CNN, AlexNet, a VGG-style network and ResNet-18 trained with one shared function — parameters move from the FC head into the conv layers as test accuracy climbs from 72% to 83%.</p>
     <p class="covers">AlexNet · VGG · ResNet · skip connections · global average pooling</p>
+  </a></li>
+
+</ol>
+
+<h2 class="sec">Interactive labs</h2>
+
+<!-- ==================================================================
+     ADDING AN ENTRY
+     Copy one <li> block below, place it anywhere in this list, and edit
+     the five marked fields. Nothing outside the block needs to change.
+     The tag class is either "lab" (blue) or "notes" (plum).
+
+     <li><a class="card" href="FILENAME.html">
+       <span class="tag lab">LABEL</span>
+       <h3>TITLE</h3>
+       <p>ONE-SENTENCE SUMMARY</p>
+       <p class="covers">topic · topic · topic</p>
+     </a></li>
+     ================================================================== -->
+
+<ol class="list">
+
+  <li><a class="card" href="gradient-descent-lab.html">
+    <span class="tag lab">Topic 08 · Interactive</span>
+    <h3>Gradient Descent and Its Types</h3>
+    <p>Batch, stochastic and mini-batch gradient descent compared in PyTorch on a purchase-prediction dataset. The update rule is developed first, then traced through a complete training loop, with the loss curve of each regime recorded and read against the theory.</p>
+    <p class="covers">batch GD · stochastic GD · mini-batch · loss curves · optimisation path · vectorisation vs. memory</p>
+  </a></li>
+
+  <li><a class="card" href="dataset-dataloader-lab.html">
+    <span class="tag lab">Topic 10 · Interactive</span>
+    <h3>Datasets and DataLoaders in PyTorch</h3>
+    <p>Why a full dataset cannot be passed to the model in one step, and how the two abstractions divide the work. A <code>Dataset</code> is built from its three required methods, then a <code>DataLoader</code> is configured around it.</p>
+    <p class="covers">Dataset · DataLoader · transforms · samplers · collate_fn · num_workers</p>
   </a></li>
 
 </ol>
